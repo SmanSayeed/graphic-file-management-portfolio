@@ -28,38 +28,36 @@
                         </div>
                     </div>
 
-                    <!-- Download Button - Below Category, Above Description -->
-                    <div class="mb-4">
-                        <div class="btn-group w-100">
-                            <button type="button" class="btn btn-outline-primary dropdown-toggle"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-download me-2"></i>
-                                Download Files
-                            </button>
-                            <ul class="dropdown-menu w-100">
-                                <li>
-                                    <a class="dropdown-item" href="#" id="downloadPNG">
-                                        <i class="bi bi-file-earmark-image text-primary me-2"></i>
-                                        <span>
-                                            <strong>PNG Image</strong>
-                                            <small class="d-block text-muted">High Quality Preview</small>
-                                        </span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="#" id="downloadSource">
-                                        <i class="bi bi-file-earmark-zip text-success me-2"></i>
-                                        <span>
-                                            <strong id="sourceFileName">Source File</strong>
-                                            <small class="d-block text-muted" id="sourceFileType">AI / PSD File</small>
-                                        </span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                    <!-- Download Button - Bootstrap Default Dropdown -->
+                    <div class="dropdown mb-4">
+                        <button class="btn btn-primary dropdown-toggle w-100" type="button" id="dropdownMenuButton"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-download me-2"></i>
+                            Download Files
+                        </button>
+                        <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+                            <li>
+                                <a class="dropdown-item" href="#" id="downloadPNG">
+                                    <i class="bi bi-file-earmark-image text-primary me-2"></i>
+                                    <div class="d-inline-block">
+                                        <strong class="d-block">PNG Image</strong>
+                                        <small class="text-muted">High Quality Preview</small>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" id="downloadSource">
+                                    <i class="bi bi-file-earmark-zip text-success me-2"></i>
+                                    <div class="d-inline-block">
+                                        <strong class="d-block" id="sourceFileName">Source File</strong>
+                                        <small class="text-muted d-block" id="sourceFileType">AI / PSD File</small>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
 
                     <div class="mb-3">
@@ -139,68 +137,56 @@
         letter-spacing: 0.5px;
     }
 
-    /* Download Button - Normal Style, No Gradient */
-    .btn-group {
-        display: flex;
-    }
-
-    .btn-outline-primary {
-        border: 2px solid #667EEA;
-        color: #667EEA;
-        background: white;
-        padding: 10px 20px;
-        border-radius: 8px;
+    /* Bootstrap Default Dropdown Styles */
+    .btn-primary {
+        background-color: #667EEA !important;
+        border-color: #667EEA !important;
+        padding: 12px 20px;
         font-weight: 600;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
     }
 
-    .btn-outline-primary:hover {
-        background: #667EEA;
-        color: white;
-        border-color: #667EEA;
-    }
-
-    .btn-outline-primary:focus {
-        box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
-    }
-
-    .dropdown-toggle::after {
-        margin-left: auto;
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active {
+        background-color: #5568d3 !important;
+        border-color: #5568d3 !important;
     }
 
     .dropdown-menu {
-        border: 2px solid #e9ecef;
+        border: 1px solid rgba(0, 0, 0, .15);
         border-radius: 8px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
         padding: 8px;
-        margin-top: 5px !important;
-        width: 100%;
+        z-index: 9999 !important;
+        position: absolute !important;
+    }
+
+    .dropdown-menu.show {
+        display: block;
     }
 
     .dropdown-item {
         padding: 12px 15px;
         border-radius: 6px;
-        transition: all 0.2s ease;
+        transition: background-color 0.2s ease;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 10px;
     }
 
-    .dropdown-item:hover {
-        background: #f8f9fa;
+    .dropdown-item:hover,
+    .dropdown-item:focus {
+        background-color: #f8f9fa;
     }
 
     .dropdown-item i {
-        font-size: 20px;
+        font-size: 22px;
+        margin-top: 2px;
     }
 
     .dropdown-item strong {
         font-size: 14px;
+        font-weight: 600;
     }
 
     .dropdown-item small {
@@ -221,9 +207,9 @@
             font-size: 14px;
         }
 
-        .btn-outline-primary {
+        .btn-primary {
             padding: 10px 15px;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .dropdown-item {

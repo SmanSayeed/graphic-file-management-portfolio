@@ -83,6 +83,7 @@
     <!-- Premium Theme JS -->
     <script src="{{ asset('js/premium-theme.js') }}"></script>
     <script src="{{ asset('js/navigation-slider.js') }}"></script>
+    <script src="{{ asset('js/modal-dropdown-fix.js') }}"></script>
 
     @stack('scripts')
 </body>

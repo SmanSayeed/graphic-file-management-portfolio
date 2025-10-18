@@ -166,7 +166,7 @@
         </div>
 
         <!-- Portfolio Grid -->
-        <div class="row g-4 portfolio-grid">
+        <div class="row portfolio-grid" style="margin-left: -10px; margin-right: -10px;">
             @foreach ($projects as $project)
                 <x-premium.portfolio-item :project="$project" />
             @endforeach
@@ -266,6 +266,14 @@
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('portfolioModal'));
         modal.show();
+
+        // Initialize dropdown after modal is shown
+        setTimeout(function() {
+            const dropdownButton = document.getElementById('dropdownMenuButton');
+            if (dropdownButton && typeof bootstrap !== 'undefined') {
+                new bootstrap.Dropdown(dropdownButton);
+            }
+        }, 100);
     }
 
     // Load More Projects Function

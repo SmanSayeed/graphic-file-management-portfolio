@@ -1,6 +1,6 @@
 @props(['project'])
 
-<div class="col-lg-4 col-md-6 portfolio-item {{ $project['category'] }}">
+<div class="col-lg-4 col-md-6 portfolio-item {{ $project['category'] }}" style="padding-left: 10px; padding-right: 10px;">
     <div class="position-relative portfolio-card">
         <span class="portfolio-badge badge-{{ $project['type'] === 'free' ? 'free' : 'paid' }}">
             {{ strtoupper($project['type']) }}
@@ -22,11 +22,19 @@
         overflow: hidden;
         border-radius: 20px;
         transition: all 0.3s ease;
+        margin-bottom: 20px;
     }
 
     .portfolio-card:hover {
         transform: translateY(-10px);
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .portfolio-image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        display: block;
     }
 
     .btn-view-premium {
