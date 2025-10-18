@@ -1,0 +1,234 @@
+/* ========================================
+   PREMIUM BOOTSTRAP HERO SLIDER
+   ======================================== */
+
+.hero-slider-premium {
+    margin-top: 70px;
+    position: relative;
+    overflow: hidden;
+}
+
+.carousel-hero {
+    position: relative;
+}
+
+.hero-slide-item {
+    position: relative;
+    height: 90vh;
+    min-height: 500px;
+}
+
+.hero-slide-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Slide Overlay */
+.hero-slide-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.1) 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 60px 20px;
+}
+
+/* View Projects Button */
+.btn-view-projects {
+    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+    color: white;
+    padding: 18px 45px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 18px;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.4s ease;
+    border: 3px solid white;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    animation: pulse 2s infinite;
+}
+
+.btn-view-projects:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
+    color: white;
+    background: linear-gradient(135deg, #764BA2 0%, #667EEA 100%);
+}
+
+.btn-view-projects i {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.btn-view-projects:hover i {
+    transform: translateX(5px);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(102, 126, 234, 0.7);
+    }
+
+    50% {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 20px rgba(102, 126, 234, 0);
+    }
+}
+
+/* Bootstrap Carousel Controls */
+.carousel-hero .carousel-control-prev,
+.carousel-hero .carousel-control-next {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 1;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-hero .carousel-control-prev {
+    left: 30px;
+}
+
+.carousel-hero .carousel-control-next {
+    right: 30px;
+}
+
+.carousel-hero .carousel-control-prev-icon,
+.carousel-hero .carousel-control-next-icon {
+    width: 28px;
+    height: 28px;
+    background-size: 100%;
+    filter: invert(1) brightness(0);
+}
+
+.carousel-hero .carousel-control-prev-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z'/%3e%3c/svg%3e");
+}
+
+.carousel-hero .carousel-control-next-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.carousel-hero .carousel-control-prev:hover,
+.carousel-hero .carousel-control-next:hover {
+    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.carousel-hero .carousel-control-prev:hover .carousel-control-prev-icon,
+.carousel-hero .carousel-control-next:hover .carousel-control-next-icon {
+    filter: invert(0) brightness(10);
+}
+
+/* Bootstrap Carousel Indicators */
+.carousel-hero .carousel-indicators {
+    bottom: 30px;
+    margin-bottom: 0;
+}
+
+.carousel-hero .carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 2px solid white;
+    transition: all 0.3s ease;
+    margin: 0 5px;
+}
+
+.carousel-hero .carousel-indicators button.active {
+    width: 30px;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.carousel-hero .carousel-indicators button:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: scale(1.2);
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .hero-slide-item {
+        height: 70vh;
+        min-height: 400px;
+    }
+
+    .carousel-hero .carousel-control-prev,
+    .carousel-hero .carousel-control-next {
+        width: 50px;
+        height: 50px;
+    }
+
+    .carousel-hero .carousel-control-prev-icon,
+    .carousel-hero .carousel-control-next-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .carousel-hero .carousel-control-prev {
+        left: 15px;
+    }
+
+    .carousel-hero .carousel-control-next {
+        right: 15px;
+    }
+
+    .btn-view-projects {
+        padding: 15px 35px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-slider-premium {
+        margin-top: 65px;
+    }
+
+    .hero-slide-item {
+        height: 60vh;
+        min-height: 350px;
+    }
+
+    .carousel-hero .carousel-control-prev,
+    .carousel-hero .carousel-control-next {
+        width: 40px;
+        height: 40px;
+    }
+
+    .carousel-hero .carousel-control-prev-icon,
+    .carousel-hero .carousel-control-next-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .carousel-hero .carousel-indicators {
+        bottom: 20px;
+    }
+
+    .btn-view-projects {
+        padding: 12px 28px;
+        font-size: 14px;
+    }
+
+    .hero-slide-overlay {
+        padding: 40px 15px;
+    }
+}
