@@ -8,20 +8,22 @@
     $projectCategoryName = is_object($project)
         ? $project->category->name ?? 'Uncategorized'
         : $project['categoryName'] ?? 'Uncategorized';
-    $projectFileType = is_object($project) ? $project->file_type : ($project['file_type'] ?? 'image');
-    $projectThumbnail = is_object($project) ? $project->thumbnail : ($project['thumbnail'] ?? null);
-    $projectVideoLink = is_object($project) ? $project->video_link : ($project['video_link'] ?? null);
-    $projectImage = is_object($project) && $projectThumbnail
-        ? asset('storage/' . $projectThumbnail)
-        : ($project['image'] ?? 'https://via.placeholder.com/800x600');
+    $projectType = is_object($project) ? $project->type : $project['type'] ?? 'free';
+    $projectFileType = is_object($project) ? $project->file_type : $project['file_type'] ?? 'image';
+    $projectThumbnail = is_object($project) ? $project->thumbnail : $project['thumbnail'] ?? null;
+    $projectVideoLink = is_object($project) ? $project->video_link : $project['video_link'] ?? null;
+    $projectImage =
+        is_object($project) && $projectThumbnail
+            ? asset('storage/' . $projectThumbnail)
+            : $project['image'] ?? 'https://via.placeholder.com/800x600';
 @endphp
 
 <div class="col-lg-4 col-md-6 portfolio-item {{ $projectCategory }}" style="padding-left: 10px; padding-right: 10px;">
     <div class="position-relative portfolio-card">
-        <span class="portfolio-badge badge-{{ $projectFileType === 'image' ? 'image' : 'video' }}">
-            {{ strtoupper($projectFileType) }}
+        <span class="portfolio-badge badge-{{ $projectType === 'free' ? 'free' : 'paid' }}">
+            {{ strtoupper($projectType) }}
         </span>
-        @if($projectFileType === 'video' && $projectVideoLink)
+        @if ($projectFileType === 'video' && $projectVideoLink)
             @php
                 $embedUrl = $projectVideoLink;
                 if (str_contains($embedUrl, 'youtube.com/watch?v=')) {
@@ -35,7 +37,9 @@
                 }
             @endphp
             <div class="portfolio-video-wrapper">
-                <iframe src="{{ $embedUrl }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="portfolio-image img-fluid rounded-4"></iframe>
+                <iframe src="{{ $embedUrl }}" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen class="portfolio-image img-fluid rounded-4"></iframe>
             </div>
         @else
             <img src="{{ $projectImage }}" alt="{{ $projectTitle }}" class="portfolio-image img-fluid rounded-4">
@@ -95,8 +99,18 @@
         color: #212529;
     }
 
+    .portfolio-badge.badge-free {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .portfolio-badge.badge-paid {
+        background: #ffc107;
+        color: #212529;
+    }
+
     .btn-view-premium {
-        background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+        background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);
         color: white;
         border: none;
         padding: 12px 30px;
@@ -107,12 +121,12 @@
         transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
     }
 
     .btn-view-premium:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        box-shadow: 0 8px 25px rgba(0, 184, 148, 0.5);
     }
 
     .portfolio-category {

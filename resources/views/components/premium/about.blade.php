@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row justify-content-center mb-5">
             <div class="col-lg-8 text-center" data-aos="fade-up">
-                <h2 class="section-title display-font">About Creative Studio</h2>
+                <h2 class="section-title display-font">About {{ $siteSettings->site_name ?? 'Creative Studio' }}</h2>
                 <p class="section-subtitle">Crafting exceptional designs that elevate brands and captivate audiences
                     worldwide</p>
             </div>

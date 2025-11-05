@@ -5,10 +5,17 @@
             <div class="d-flex justify-content-between align-items-center w-100">
                 <!-- Logo (Left) -->
                 <a href="#home" class="logo-premium">
-                    <div class="logo-icon">
-                        <i class="bi bi-brush"></i>
-                    </div>
-                    <span class="display-font">Graphic<span style="font-weight: 300;">Portfolio</span></span>
+                    @if (isset($siteSettings) && $siteSettings->logo)
+                        <img src="{{ asset('storage/' . $siteSettings->logo) }}"
+                            alt="{{ $siteSettings->site_name ?? 'Logo' }}"
+                            style="height: 40px; width: auto; object-fit: contain;">
+                    @else
+                        <div class="logo-icon">
+                            <i class="bi bi-brush"></i>
+                        </div>
+                        <span class="display-font">{{ $siteSettings->site_name ?? 'Graphic' }}<span
+                                style="font-weight: 300;">Portfolio</span></span>
+                    @endif
                 </a>
 
                 <!-- Desktop Navigation (Right) -->
@@ -27,25 +34,46 @@
                     </li>
                     @auth
                         <li class="nav-item-premium">
-                            <div class="dropdown">
-                                <button class="btn-nav-cta dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    {{ Auth::user()->name }}
+                            <div class="custom-user-dropdown">
+                                <button class="custom-user-btn" type="button" id="userDropdownBtn">
+                                    <i class="bi bi-person-circle me-2"></i>
+                                    <span>{{ Auth::user()->name }}</span>
+                                    <i class="bi bi-chevron-down ms-2 dropdown-arrow"></i>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="{{ route('home') }}#contact">Profile</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('home') }}#contact">Change Password</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form action="{{ route('auth.logout') }}" method="POST" class="dropdown-item mb-0">
-                                            @csrf
-                                            <button type="submit"
-                                                class="btn btn-link p-0 text-start w-100 text-decoration-none"
-                                                style="color: inherit;">Logout</button>
-                                        </form>
-                                    </li>
-                                </ul>
+                                <div class="custom-dropdown-menu" id="userDropdownMenu">
+                                    @if (Auth::user()->isAdmin())
+                                        <a href="{{ route('admin.profile.edit') }}" target="_blank"
+                                            class="custom-dropdown-item">
+                                            <i class="bi bi-person me-2"></i>
+                                            Profile
+                                            <i class="bi bi-box-arrow-up-right ms-auto" style="font-size: 12px;"></i>
+                                        </a>
+                                        <a href="{{ route('admin.profile.edit') }}#password" target="_blank"
+                                            class="custom-dropdown-item">
+                                            <i class="bi bi-key me-2"></i>
+                                            Change Password
+                                            <i class="bi bi-box-arrow-up-right ms-auto" style="font-size: 12px;"></i>
+                                        </a>
+                                    @else
+                                        <a href="{{ route('user.profile.show') }}" class="custom-dropdown-item">
+                                            <i class="bi bi-person me-2"></i>
+                                            Profile
+                                        </a>
+                                        <a href="{{ route('user.profile.edit') }}#password" class="custom-dropdown-item">
+                                            <i class="bi bi-key me-2"></i>
+                                            Change Password
+                                        </a>
+                                    @endif
+                                    <div class="custom-dropdown-divider"></div>
+                                    <form action="{{ route('auth.logout') }}" method="POST"
+                                        class="custom-dropdown-item-form">
+                                        @csrf
+                                        <button type="submit" class="custom-dropdown-item logout-btn">
+                                            <i class="bi bi-box-arrow-right me-2"></i>
+                                            Logout
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </li>
                     @else
@@ -73,9 +101,18 @@
 <div class="mobile-drawer">
     <!-- Drawer Header -->
     <div class="drawer-header">
-        <div class="drawer-logo">
-            <i class="bi bi-brush me-2"></i>
-            GraphicPortfolio
+        <div class="drawer-logo" style="display: flex; align-items: center;">
+            @if (isset($siteSettings) && $siteSettings->logo)
+                <img src="{{ asset('storage/' . $siteSettings->logo) }}"
+                    alt="{{ $siteSettings->site_name ?? 'Logo' }}"
+                    style="height: 30px; width: auto; object-fit: contain;">
+            @else
+                <i class="bi bi-brush me-2" style="color: #00B894;"></i>
+                <span
+                    style="background: linear-gradient(135deg, #00B894 0%, #F5576C 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    {{ $siteSettings->site_name ?? 'GraphicPortfolio' }}
+                </span>
+            @endif
         </div>
         <button class="drawer-close">
             <i class="bi bi-x"></i>
@@ -113,13 +150,31 @@
     <!-- Drawer Footer -->
     <div class="drawer-footer">
         @auth
-            <a href="{{ route('home') }}#contact" class="drawer-cta">
-                <i class="bi bi-person-circle me-2"></i>
-                {{ Auth::user()->name }}
-            </a>
-            <form action="{{ route('auth.logout') }}" method="POST" class="mt-2">
+            @if (Auth::user()->isAdmin())
+                <a href="{{ route('admin.profile.edit') }}" target="_blank" class="drawer-menu-link">
+                    <i class="bi bi-person me-2"></i>
+                    Profile
+                    <i class="bi bi-box-arrow-up-right ms-auto" style="font-size: 12px;"></i>
+                </a>
+                <a href="{{ route('admin.profile.edit') }}#password" target="_blank" class="drawer-menu-link">
+                    <i class="bi bi-key me-2"></i>
+                    Change Password
+                    <i class="bi bi-box-arrow-up-right ms-auto" style="font-size: 12px;"></i>
+                </a>
+            @else
+                <a href="{{ route('user.profile.show') }}" class="drawer-menu-link">
+                    <i class="bi bi-person me-2"></i>
+                    Profile
+                </a>
+                <a href="{{ route('user.profile.edit') }}#password" class="drawer-menu-link">
+                    <i class="bi bi-key me-2"></i>
+                    Change Password
+                </a>
+            @endif
+            <div class="drawer-menu-divider"></div>
+            <form action="{{ route('auth.logout') }}" method="POST" class="drawer-logout-form">
                 @csrf
-                <button type="submit" class="drawer-cta-secondary">
+                <button type="submit" class="drawer-menu-link logout-link">
                     <i class="bi bi-box-arrow-right me-2"></i>Logout
                 </button>
             </form>
@@ -133,13 +188,6 @@
                 Register
             </a>
         @endauth
-
-        <div class="drawer-social mt-4">
-            <a href="#"><i class="bi bi-twitter"></i></a>
-            <a href="#"><i class="bi bi-instagram"></i></a>
-            <a href="#"><i class="bi bi-linkedin"></i></a>
-            <a href="#"><i class="bi bi-dribbble"></i></a>
-        </div>
     </div>
 </div>
 

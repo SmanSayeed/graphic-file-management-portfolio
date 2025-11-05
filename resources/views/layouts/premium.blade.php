@@ -61,7 +61,7 @@
 
     <!-- Back to Top -->
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"
-        style="position: fixed; right: 20px; bottom: 20px; width: 50px; height: 50px; background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%); color: #fff; border-radius: 50%; display: none; z-index: 999; transition: all 0.3s;">
+        style="position: fixed; right: 20px; bottom: 20px; width: 50px; height: 50px; background: linear-gradient(135deg, #00B894 0%, #F5576C 100%); color: #fff; border-radius: 50%; display: none; z-index: 999; transition: all 0.3s;">
         <i class="bi bi-arrow-up"></i>
     </a>
 
@@ -82,6 +82,9 @@
 
     <!-- Common JS for Bootstrap fixes -->
     <script src="{{ asset('js/common.js') }}"></script>
+
+    <!-- Custom User Dropdown JS -->
+    <script src="{{ asset('js/custom-user-dropdown.js') }}"></script>
 
     <!-- Premium Theme JS -->
     <script src="{{ asset('js/premium-theme.js') }}"></script>

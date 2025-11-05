@@ -41,7 +41,7 @@
 
 /* View Projects Button */
 .btn-view-projects {
-    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+    background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);
     color: white;
     padding: 18px 45px;
     border-radius: 50px;
@@ -61,9 +61,9 @@
 
 .btn-view-projects:hover {
     transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 20px 50px rgba(0, 184, 148, 0.4);
     color: white;
-    background: linear-gradient(135deg, #764BA2 0%, #667EEA 100%);
+    background: linear-gradient(135deg, #F5576C 0%, #00B894 100%);
 }
 
 .btn-view-projects i {
@@ -79,11 +79,11 @@
 
     0%,
     100% {
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(102, 126, 234, 0.7);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 0 rgba(0, 184, 148, 0.7);
     }
 
     50% {
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 20px rgba(102, 126, 234, 0);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3), 0 0 0 20px rgba(0, 184, 148, 0);
     }
 }
 
@@ -127,9 +127,9 @@
 
 .carousel-hero .carousel-control-prev:hover,
 .carousel-hero .carousel-control-next:hover {
-    background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+    background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);
     transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 25px rgba(0, 184, 148, 0.4);
 }
 
 .carousel-hero .carousel-control-prev:hover .carousel-control-prev-icon,

@@ -28,8 +28,8 @@
         }
 
         .auth-tab.active {
-            color: #667EEA;
-            border-bottom: 3px solid #667EEA;
+            color: #00B894;
+            border-bottom: 3px solid #00B894;
         }
 
         .tab-content {

@@ -2,10 +2,15 @@
     <div class="container">
         <div class="row g-4">
             <div class="col-lg-4 mb-4">
-                <h3 class="display-font mb-3"
-                    style="background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                    Graphic<span style="font-weight: 300;">Portfolio</span>
-                </h3>
+                @if(isset($siteSettings) && $siteSettings->logo)
+                    <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->site_name ?? 'Logo' }}" 
+                         class="mb-3" style="height: 50px; width: auto; object-fit: contain;">
+                @else
+                    <h3 class="display-font mb-3"
+                        style="background: linear-gradient(135deg, #00B894 0%, #F5576C 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                        {{ $siteSettings->site_name ?? 'Graphic' }}<span style="font-weight: 300;">Portfolio</span>
+                    </h3>
+                @endif
                 <p class="mb-4">Creating stunning designs that captivate and inspire. Professional graphic design
                     services for businesses and individuals worldwide.</p>
                 <div class="d-flex gap-2">

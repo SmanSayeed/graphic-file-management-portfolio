@@ -7,6 +7,7 @@ use App\Models\ContactInfo;
 use App\Models\FooterContent;
 use App\Models\PersonalInfo;
 use App\Models\Project;
+use App\Models\SiteSetting;
 use App\Models\Skill;
 use App\Models\Slider;
 use App\Models\SocialLink;
@@ -32,6 +33,7 @@ class HomeController extends Controller
         $contactInfo = ContactInfo::first();
         $socialLinks = SocialLink::active()->get();
         $footerContent = FooterContent::first();
+        $siteSettings = SiteSetting::getSettings();
 
         return view('welcome', compact(
             'categories',
@@ -41,7 +43,8 @@ class HomeController extends Controller
             'skills',
             'contactInfo',
             'socialLinks',
-            'footerContent'
+            'footerContent',
+            'siteSettings'
         ));
     }
 

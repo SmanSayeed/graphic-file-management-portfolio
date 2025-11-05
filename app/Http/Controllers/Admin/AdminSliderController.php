@@ -35,8 +35,9 @@ class AdminSliderController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
             'sort_order' => 'nullable|integer|min:0',
             'is_active' => 'boolean',
+            'title' => 'nullable'
         ]);
-
+        $validated['title'] = "slider";
         // Handle image upload
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('sliders', 'public');
@@ -53,7 +54,7 @@ class AdminSliderController extends Controller
 
         return redirect()->route('admin.sliders.index')
             ->with('success', 'Slider created successfully');
-    }
+    }   
 
     /**
      * Display the specified resource.
@@ -118,4 +119,3 @@ class AdminSliderController extends Controller
             ->with('success', 'Slider deleted successfully');
     }
 }
-

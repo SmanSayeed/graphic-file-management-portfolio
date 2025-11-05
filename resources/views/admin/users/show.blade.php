@@ -25,7 +25,7 @@
                                  class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
                         @else
                             <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto" 
-                                 style="width: 150px; height: 150px; background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);">
+                                 style="width: 150px; height: 150px; background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);">
                                 <span class="text-white" style="font-size: 48px; font-weight: bold;">
                                     {{ strtoupper(substr($user->name, 0, 1)) }}
                                 </span>

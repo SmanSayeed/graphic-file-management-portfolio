@@ -179,7 +179,7 @@
                         </div>
                         <div class="progress" style="height: 8px;">
                             <div class="progress-bar"
-                                style="width: 24%; background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);"></div>
+                                style="width: 24%; background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);"></div>
                         </div>
                     </div>
                     <div class="mb-3">

@@ -1,8 +1,16 @@
 <aside class="admin-sidebar">
     <div class="sidebar-header">
         <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">
-            <i class="bi bi-brush me-2"></i>
-            <span class="brand-text">GraphicPortfolio</span>
+            @php
+                $siteSettings = \App\Models\SiteSetting::getSettings();
+            @endphp
+            @if($siteSettings->logo)
+                <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->site_name ?? 'Logo' }}" 
+                     style="height: 35px; width: auto; object-fit: contain;">
+            @else
+                <i class="bi bi-brush me-2"></i>
+                <span class="brand-text">{{ $siteSettings->site_name ?? 'GraphicPortfolio' }}</span>
+            @endif
         </a>
     </div>
 
@@ -65,6 +73,12 @@
             class="menu-item {{ request()->routeIs('admin.footer.*') ? 'active' : '' }}">
             <i class="bi bi-layout-text-sidebar-reverse"></i>
             <span class="menu-text">Footer Content</span>
+        </a>
+
+        <a href="{{ route('admin.settings.edit') }}"
+            class="menu-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+            <i class="bi bi-gear"></i>
+            <span class="menu-text">Site Settings</span>
         </a>
 
         <hr style="border-color: rgba(255,255,255,0.1); margin: 20px;">

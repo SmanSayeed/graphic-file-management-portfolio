@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
 // Home Routes
@@ -19,6 +20,14 @@ Route::get('/projects/{project}/like-status', [LikeController::class, 'checkLike
 
 // Download Route
 Route::get('/projects/{project}/download', [HomeController::class, 'download'])->name('projects.download');
+
+// User Profile Routes (Protected - Normal Users)
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [UserProfileController::class, 'show'])->name('user.profile.show');
+    Route::get('/profile/edit', [UserProfileController::class, 'edit'])->name('user.profile.edit');
+    Route::put('/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
+    Route::put('/profile/password', [UserProfileController::class, 'updatePassword'])->name('user.profile.password.update');
+});
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
@@ -70,4 +79,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:root_admin,adm
     // Category Management
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     Route::post('/categories/{category}/toggle-status', [\App\Http\Controllers\Admin\CategoryController::class, 'toggleStatus'])->name('categories.toggle-status');
+
+    // Site Settings
+    Route::get('/settings', [\App\Http\Controllers\Admin\SiteSettingController::class, 'edit'])->name('settings.edit');
+    Route::put('/settings', [\App\Http\Controllers\Admin\SiteSettingController::class, 'update'])->name('settings.update');
 });

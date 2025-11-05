@@ -61,7 +61,7 @@
                                    value="{{ old('color', $category->color) }}" id="colorPicker">
                             <input type="text" class="form-control form-control-custom" 
                                    value="{{ old('color', $category->color) }}" id="colorInput" 
-                                   placeholder="#667EEA" maxlength="7">
+                                   placeholder="#00B894" maxlength="7">
                         </div>
                         <small class="text-muted">Choose a color for the category icon</small>
                         @error('color')

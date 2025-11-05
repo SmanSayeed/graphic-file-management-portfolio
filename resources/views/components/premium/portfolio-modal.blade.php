@@ -106,7 +106,7 @@
     }
 
     .modal-header {
-        background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+        background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);
         color: white;
         padding: 20px 30px;
     }
@@ -192,8 +192,8 @@
 
     /* Bootstrap Default Dropdown Styles */
     .btn-primary {
-        background-color: #667EEA !important;
-        border-color: #667EEA !important;
+        background-color: #00B894 !important;
+        border-color: #00B894 !important;
         padding: 12px 20px;
         font-weight: 600;
     }
@@ -201,8 +201,8 @@
     .btn-primary:hover,
     .btn-primary:focus,
     .btn-primary:active {
-        background-color: #5568d3 !important;
-        border-color: #5568d3 !important;
+        background-color: #00a085 !important;
+        border-color: #00a085 !important;
     }
 
     .dropdown-menu {

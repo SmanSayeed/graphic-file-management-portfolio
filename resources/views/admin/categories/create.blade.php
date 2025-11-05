@@ -57,10 +57,10 @@
                         <label class="form-label-custom">Color *</label>
                         <div class="input-group">
                             <input type="color" name="color" class="form-control form-control-color" 
-                                   value="{{ old('color', '#667EEA') }}" id="colorPicker">
+                                   value="{{ old('color', '#00B894') }}" id="colorPicker">
                             <input type="text" class="form-control form-control-custom" 
-                                   value="{{ old('color', '#667EEA') }}" id="colorInput" 
-                                   placeholder="#667EEA" maxlength="7">
+                                   value="{{ old('color', '#00B894') }}" id="colorInput" 
+                                   placeholder="#00B894" maxlength="7">
                         </div>
                         <small class="text-muted">Choose a color for the category icon</small>
                         @error('color')
