@@ -60,6 +60,15 @@
                         </ul>
                     </div>
 
+                    <!-- Like Button -->
+                    <div class="mb-4 text-center">
+                        <button type="button" class="btn btn-outline-danger btn-lg" id="likeButton" onclick="toggleLike()">
+                            <i class="bi bi-heart" id="likeIcon"></i>
+                            <span id="likeText">Like</span>
+                            <span class="badge bg-danger" id="likeCount">0</span>
+                        </button>
+                    </div>
+
                     <div class="mb-3">
                         <h6 class="detail-label">Description</h6>
                         <p class="mb-0" id="modalDescription"></p>

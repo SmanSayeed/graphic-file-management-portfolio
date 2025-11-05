@@ -80,6 +80,9 @@
     <!-- AOS Animation JS -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
+    <!-- Common JS for Bootstrap fixes -->
+    <script src="{{ asset('js/common.js') }}"></script>
+
     <!-- Premium Theme JS -->
     <script src="{{ asset('js/premium-theme.js') }}"></script>
     <script src="{{ asset('js/navigation-slider.js') }}"></script>

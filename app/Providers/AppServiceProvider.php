@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Set the login route for authentication
+        if (method_exists($this->app['config'], 'set')) {
+            $this->app['config']->set('auth.passwords.users.email', 'auth.emails.password');
+        }
     }
 }

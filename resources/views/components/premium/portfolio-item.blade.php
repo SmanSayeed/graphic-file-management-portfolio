@@ -1,15 +1,29 @@
 @props(['project'])
 
-<div class="col-lg-4 col-md-6 portfolio-item {{ $project['category'] }}" style="padding-left: 10px; padding-right: 10px;">
+@php
+    // Handle both array and object data
+    $projectId = is_object($project) ? $project->id : $project['id'];
+    $projectTitle = is_object($project) ? $project->title : $project['title'];
+    $projectCategory = is_object($project) ? $project->category->slug ?? 'default' : $project['category'] ?? 'default';
+    $projectCategoryName = is_object($project)
+        ? $project->category->name ?? 'Uncategorized'
+        : $project['categoryName'] ?? 'Uncategorized';
+    $projectType = is_object($project) ? $project->type : $project['type'];
+    $projectImage = is_object($project)
+        ? asset('storage/' . $project->thumbnail)
+        : $project['image'] ?? 'https://via.placeholder.com/800x600';
+@endphp
+
+<div class="col-lg-4 col-md-6 portfolio-item {{ $projectCategory }}" style="padding-left: 10px; padding-right: 10px;">
     <div class="position-relative portfolio-card">
-        <span class="portfolio-badge badge-{{ $project['type'] === 'free' ? 'free' : 'paid' }}">
-            {{ strtoupper($project['type']) }}
+        <span class="portfolio-badge badge-{{ $projectType === 'free' ? 'free' : 'paid' }}">
+            {{ strtoupper($projectType) }}
         </span>
-        <img src="{{ $project['image'] }}" alt="{{ $project['title'] }}" class="portfolio-image img-fluid rounded-4">
+        <img src="{{ $projectImage }}" alt="{{ $projectTitle }}" class="portfolio-image img-fluid rounded-4">
         <div class="portfolio-overlay">
-            <h4>{{ $project['title'] }}</h4>
-            <p class="portfolio-category">{{ $project['categoryName'] }}</p>
-            <button class="btn-view-premium" onclick="openPortfolioModal({{ json_encode($project) }})">
+            <h4>{{ $projectTitle }}</h4>
+            <p class="portfolio-category">{{ $projectCategoryName }}</p>
+            <button class="btn-view-premium" onclick="openProjectModal({{ $projectId }})">
                 <i class="bi bi-eye me-2"></i>
                 View Details
             </button>

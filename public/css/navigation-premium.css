@@ -136,6 +136,27 @@ html {
     color: white;
 }
 
+/* Secondary CTA Button */
+.btn-nav-cta-secondary {
+    background: transparent;
+    color: #667EEA;
+    padding: 10px 25px;
+    border-radius: 50px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 2px solid #667EEA;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.btn-nav-cta-secondary:hover {
+    background: #667EEA;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
 /* Mobile Menu Toggle */
 .mobile-menu-toggle {
     display: none;
@@ -301,6 +322,27 @@ html {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
     color: white;
+}
+
+.drawer-cta-secondary {
+    display: block;
+    background: transparent;
+    color: #667EEA;
+    border: 2px solid #667EEA;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.drawer-cta-secondary:hover {
+    background: #667EEA;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
 }
 
 .drawer-social {

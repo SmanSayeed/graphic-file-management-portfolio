@@ -1,150 +1,6 @@
 @php
-    $projects = [
-        [
-            'id' => 1,
-            'title' => 'Modern Logo Design',
-            'category' => 'logo',
-            'categoryName' => 'Brand Identity',
-            'description' =>
-                'Clean and professional logo perfect for tech startups and modern businesses. Includes multiple variations and color schemes for versatile usage across different platforms.',
-            'image' =>
-                'https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            'type' => 'free',
-            'downloads' => [
-                'png' => '#download-png-1',
-                'source' => '#download-ai-1',
-                'sourceType' => 'Adobe Illustrator (AI)',
-            ],
-        ],
-        [
-            'id' => 2,
-            'title' => 'Social Media Pack',
-            'category' => 'social',
-            'categoryName' => 'Instagram Templates',
-            'description' =>
-                'Instagram post template with modern typography and vibrant colors. Perfect for social media marketing campaigns and brand consistency.',
-            'image' =>
-                'https://images.unsplash.com/photo-1611262588024-d12430b98920?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            'type' => 'paid',
-            'downloads' => [
-                'png' => '#download-png-2',
-                'source' => '#download-psd-2',
-                'sourceType' => 'Photoshop (PSD)',
-            ],
-        ],
-        [
-            'id' => 3,
-            'title' => 'Promotional Banner',
-            'category' => 'banner',
-            'categoryName' => 'Marketing Design',
-            'description' =>
-                'Eye-catching banner design for marketing campaigns and promotions. Optimized for both web and print usage with high resolution output.',
-            'image' =>
-                'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            'type' => 'free',
-            'downloads' => [
-                'png' => '#download-png-3',
-                'source' => '#download-ai-3',
-                'sourceType' => 'Adobe Illustrator (AI)',
-            ],
-        ],
-        [
-            'id' => 4,
-            'title' => 'E-commerce Mockup',
-            'category' => 'ecommerce',
-            'categoryName' => 'Product Design',
-            'description' =>
-                'Professional product mockup template for online stores. Includes smart objects for easy customization and multiple angle views.',
-            'image' =>
-                'https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            'type' => 'paid',
-            'downloads' => [
-                'png' => '#download-png-4',
-                'source' => '#download-psd-4',
-                'sourceType' => 'Photoshop (PSD)',
-            ],
-        ],
-        [
-            'id' => 5,
-            'title' => 'Creative Logo Set',
-            'category' => 'logo',
-            'categoryName' => 'Brand Identity',
-            'description' =>
-                'Collection of creative logos suitable for various industries. Each logo is fully editable and comes with usage guidelines.',
-            'image' =>
-                'https://images.unsplash.com/photo-1558655146-9f40138edfeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            'type' => 'free',
-            'downloads' => [
-                'png' => '#download-png-5',
-                'source' => '#download-ai-5',
-                'sourceType' => 'Adobe Illustrator (AI)',
-            ],
-        ],
-        [
-            'id' => 6,
-            'title' => 'Social Media Bundle',
-            'category' => 'social',
-            'categoryName' => 'Facebook & Instagram',
-            'description' =>
-                'Complete social media bundle with templates for Facebook, Instagram, and Twitter. Includes stories, posts, and cover images.',
-            'image' =>
-                'https://images.unsplash.com/photo-1634942537064-7cb3e007b0f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            'type' => 'paid',
-            'downloads' => [
-                'png' => '#download-png-6',
-                'source' => '#download-psd-6',
-                'sourceType' => 'Photoshop (PSD)',
-            ],
-        ],
-        [
-            'id' => 7,
-            'title' => 'Web Banner Pack',
-            'category' => 'banner',
-            'categoryName' => 'Digital Advertising',
-            'description' =>
-                'Professional web banner pack for digital advertising. Multiple sizes included for various ad platforms and placements.',
-            'image' =>
-                'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            'type' => 'free',
-            'downloads' => [
-                'png' => '#download-png-7',
-                'source' => '#download-ai-7',
-                'sourceType' => 'Adobe Illustrator (AI)',
-            ],
-        ],
-        [
-            'id' => 8,
-            'title' => 'Product Showcase',
-            'category' => 'ecommerce',
-            'categoryName' => 'E-commerce Template',
-            'description' =>
-                'Elegant product showcase template for e-commerce websites. Features clean layout and professional product presentation.',
-            'image' =>
-                'https://images.unsplash.com/photo-1556740714-a8395b3bf30f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            'type' => 'paid',
-            'downloads' => [
-                'png' => '#download-png-8',
-                'source' => '#download-psd-8',
-                'sourceType' => 'Photoshop (PSD)',
-            ],
-        ],
-        [
-            'id' => 9,
-            'title' => 'Minimal Logo Collection',
-            'category' => 'logo',
-            'categoryName' => 'Startup Branding',
-            'description' =>
-                'Minimal and modern logo collection perfect for startups and tech companies. Clean design with versatile applications.',
-            'image' =>
-                'https://images.unsplash.com/photo-1626785774573-4b799315345d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            'type' => 'free',
-            'downloads' => [
-                'png' => '#download-png-9',
-                'source' => '#download-ai-9',
-                'sourceType' => 'Adobe Illustrator (AI)',
-            ],
-        ],
-    ];
+    // Projects come from HomeController
+    $projects = $projects ?? [];
 @endphp
 
 <section id="portfolio" class="section-premium">
@@ -240,8 +96,58 @@
 
     let currentLoadIndex = 0;
     const loadMoreCount = 3;
+    let currentProjectId = null;
 
-    // Open Portfolio Modal Function
+    // Open Project Modal with dynamic data
+    async function openProjectModal(projectId) {
+        currentProjectId = projectId;
+        try {
+            const response = await fetch(`/project/${projectId}`);
+            const project = await response.json();
+
+            // Set modal content
+            document.getElementById('modalTitle').textContent = project.title;
+            document.getElementById('modalImage').src = project.thumbnail ? `/storage/${project.thumbnail}` :
+                'https://via.placeholder.com/800x600';
+            document.getElementById('modalImage').alt = project.title;
+            document.getElementById('modalCategory').textContent = project.category?.name || 'Uncategorized';
+            document.getElementById('modalType').textContent = project.type.toUpperCase();
+            document.getElementById('modalDescription').textContent = project.description;
+
+            // Set type badge
+            const badge = document.getElementById('modalTypeBadge');
+            badge.textContent = project.type.toUpperCase();
+            badge.className = 'modal-type-badge ' + project.type;
+
+            // Set download links
+            if (project.image) {
+                document.getElementById('downloadPNG').href = `/storage/${project.image}`;
+                document.getElementById('downloadPNG').style.display = 'block';
+            } else {
+                document.getElementById('downloadPNG').style.display = 'none';
+            }
+
+            if (project.source_file) {
+                document.getElementById('downloadSource').href = `/storage/${project.source_file}`;
+                document.getElementById('downloadSource').style.display = 'block';
+            } else {
+                document.getElementById('downloadSource').style.display = 'none';
+            }
+
+            // Update like button
+            updateLikeButton(project.like_count, project.is_liked);
+            document.getElementById('likeCount').textContent = project.like_count || 0;
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('portfolioModal'));
+            modal.show();
+        } catch (error) {
+            console.error('Error fetching project:', error);
+            alert('Failed to load project details');
+        }
+    }
+
+    // Open Portfolio Modal Function (for static data)
     function openPortfolioModal(project) {
         // Set modal content
         document.getElementById('modalTitle').textContent = project.title;
@@ -333,6 +239,61 @@
         if (currentLoadIndex >= window.additionalProjects.length) {
             loadMoreBtn.classList.add('d-none');
             document.getElementById('noMoreProjects').classList.remove('d-none');
+        }
+    }
+
+    // Toggle Like Function
+    async function toggleLike() {
+        if (!currentProjectId) return;
+
+        // Check if user is logged in
+        const response = await fetch(`/projects/${currentProjectId}/like-status`);
+        const status = await response.json();
+
+        if (!status.is_authenticated) {
+            alert('Please login to like projects');
+            window.location.href = '/login?tab=login';
+            return;
+        }
+
+        try {
+            const likeResponse = await fetch(`/projects/${currentProjectId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+                },
+                body: JSON.stringify({})
+            });
+
+            const data = await likeResponse.json();
+
+            if (data.success) {
+                updateLikeButton(data.like_count, data.is_liked);
+                document.getElementById('likeCount').textContent = data.like_count;
+            }
+        } catch (error) {
+            console.error('Error toggling like:', error);
+            alert('Failed to update like');
+        }
+    }
+
+    // Update Like Button
+    function updateLikeButton(likeCount, isLiked) {
+        const likeIcon = document.getElementById('likeIcon');
+        const likeText = document.getElementById('likeText');
+        const likeButton = document.getElementById('likeButton');
+
+        if (isLiked) {
+            likeIcon.className = 'bi bi-heart-fill';
+            likeText.textContent = 'Liked';
+            likeButton.classList.add('btn-danger');
+            likeButton.classList.remove('btn-outline-danger');
+        } else {
+            likeIcon.className = 'bi bi-heart';
+            likeText.textContent = 'Like';
+            likeButton.classList.remove('btn-danger');
+            likeButton.classList.add('btn-outline-danger');
         }
     }
 </script>

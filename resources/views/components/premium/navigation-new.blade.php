@@ -25,9 +25,37 @@
                     <li class="nav-item-premium">
                         <a href="#contact" class="nav-link-premium">Contact</a>
                     </li>
-                    <li class="nav-item-premium">
-                        <a href="#contact" class="btn-nav-cta">Get Started</a>
-                    </li>
+                    @auth
+                        <li class="nav-item-premium">
+                            <div class="dropdown">
+                                <button class="btn-nav-cta dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    {{ Auth::user()->name }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="{{ route('home') }}#contact">Profile</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('home') }}#contact">Change Password</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <form action="{{ route('auth.logout') }}" method="POST" class="dropdown-item mb-0">
+                                            @csrf
+                                            <button type="submit"
+                                                class="btn btn-link p-0 text-start w-100 text-decoration-none"
+                                                style="color: inherit;">Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    @else
+                        <li class="nav-item-premium">
+                            <a href="{{ route('auth.login') }}" class="btn-nav-cta-secondary">Login</a>
+                        </li>
+                        <li class="nav-item-premium">
+                            <a href="{{ route('auth.register') }}?tab=register" class="btn-nav-cta">Register</a>
+                        </li>
+                    @endauth
                 </ul>
 
                 <!-- Mobile Menu Toggle -->
@@ -84,12 +112,29 @@
 
     <!-- Drawer Footer -->
     <div class="drawer-footer">
-        <a href="#contact" class="drawer-cta">
-            <i class="bi bi-rocket-takeoff me-2"></i>
-            Get Started
-        </a>
+        @auth
+            <a href="{{ route('home') }}#contact" class="drawer-cta">
+                <i class="bi bi-person-circle me-2"></i>
+                {{ Auth::user()->name }}
+            </a>
+            <form action="{{ route('auth.logout') }}" method="POST" class="mt-2">
+                @csrf
+                <button type="submit" class="drawer-cta-secondary">
+                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                </button>
+            </form>
+        @else
+            <a href="{{ route('auth.login') }}" class="drawer-cta-secondary">
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                Login
+            </a>
+            <a href="{{ route('auth.register') }}?tab=register" class="drawer-cta mt-2">
+                <i class="bi bi-person-plus me-2"></i>
+                Register
+            </a>
+        @endauth
 
-        <div class="drawer-social">
+        <div class="drawer-social mt-4">
             <a href="#"><i class="bi bi-twitter"></i></a>
             <a href="#"><i class="bi bi-instagram"></i></a>
             <a href="#"><i class="bi bi-linkedin"></i></a>
