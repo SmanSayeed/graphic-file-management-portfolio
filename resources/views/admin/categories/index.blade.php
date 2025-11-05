@@ -4,15 +4,29 @@
 @section('page-title', 'Categories Management')
 
 @section('content')
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
     <div class="mb-4">
-        <button class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+        <a href="{{ route('admin.categories.create') }}" class="btn btn-admin-primary">
             <i class="bi bi-plus-circle me-2"></i>Add New Category
-        </button>
+        </a>
     </div>
 
     <div class="content-card">
-        <div class="card-header-custom">
-            <h5 class="mb-0 fw-bold">All Categories</h5>
+        <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">All Categories ({{ $categories->total() }})</h5>
         </div>
         <div class="card-body-custom">
             <div class="table-responsive">
@@ -27,131 +41,151 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-primary text-white rounded p-2 me-3">
-                                        <i class="bi bi-brush"></i>
+                        @forelse($categories as $category)
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded p-2 me-3" style="background-color: {{ $category->color }};">
+                                            <i class="{{ $category->icon }} text-white"></i>
+                                        </div>
+                                        <span class="fw-semibold">{{ $category->name }}</span>
                                     </div>
-                                    <span class="fw-semibold">Logo Design</span>
-                                </div>
-                            </td>
-                            <td class="text-muted">logo</td>
-                            <td><span class="badge bg-primary">8 projects</span></td>
-                            <td><span class="badge bg-success">Active</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
-                                    data-bs-target="#editCategoryModal">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-info text-white rounded p-2 me-3">
-                                        <i class="bi bi-share"></i>
+                                </td>
+                                <td class="text-muted">{{ $category->slug }}</td>
+                                <td>
+                                    <span class="badge" style="background-color: {{ $category->color }};">
+                                        {{ $category->projects_count }} {{ Str::plural('project', $category->projects_count) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch d-inline-block">
+                                        <input class="form-check-input status-toggle" 
+                                               type="checkbox" 
+                                               role="switch" 
+                                               data-category-id="{{ $category->id }}"
+                                               {{ $category->is_active ? 'checked' : '' }}
+                                               id="statusSwitch{{ $category->id }}">
+                                        <label class="form-check-label" for="statusSwitch{{ $category->id }}">
+                                            <span class="badge ms-2 {{ $category->is_active ? 'bg-success' : 'bg-secondary' }}" id="statusBadge{{ $category->id }}">
+                                                {{ $category->is_active ? 'Active' : 'Inactive' }}
+                                            </span>
+                                        </label>
                                     </div>
-                                    <span class="fw-semibold">Social Media</span>
-                                </div>
-                            </td>
-                            <td class="text-muted">social</td>
-                            <td><span class="badge bg-info">5 projects</span></td>
-                            <td><span class="badge bg-success">Active</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-warning text-white rounded p-2 me-3">
-                                        <i class="bi bi-badge-ad"></i>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('admin.categories.edit', $category->id) }}" 
+                                           class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="{{ route('admin.categories.destroy', $category->id) }}" 
+                                              method="POST" 
+                                              class="d-inline" 
+                                              onsubmit="return confirm('Are you sure you want to delete this category? This will fail if there are projects assigned to it.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
                                     </div>
-                                    <span class="fw-semibold">Banners</span>
-                                </div>
-                            </td>
-                            <td class="text-muted">banner</td>
-                            <td><span class="badge bg-warning">4 projects</span></td>
-                            <td><span class="badge bg-success">Active</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="bg-success text-white rounded p-2 me-3">
-                                        <i class="bi bi-cart"></i>
-                                    </div>
-                                    <span class="fw-semibold">E-commerce</span>
-                                </div>
-                            </td>
-                            <td class="text-muted">ecommerce</td>
-                            <td><span class="badge bg-success">7 projects</span></td>
-                            <td><span class="badge bg-success">Active</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    <p class="text-muted mb-0">No categories found. <a href="{{ route('admin.categories.create') }}">Create your first category</a></p>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
 
-    <!-- Add Category Modal -->
-    <div class="modal fade" id="addCategoryModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Category</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            @if($categories->hasPages())
+                <div class="mt-3">
+                    {{ $categories->links() }}
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label-custom">Category Name</label>
-                        <input type="text" class="form-control form-control-custom" placeholder="e.g., Print Design">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label-custom">Slug (auto-generated)</label>
-                        <input type="text" class="form-control form-control-custom" placeholder="print-design" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label-custom">Icon (Bootstrap Icon)</label>
-                        <input type="text" class="form-control form-control-custom" placeholder="bi-printer"
-                            value="bi-printer">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label-custom">Color</label>
-                        <input type="color" class="form-control form-control-custom" value="#667EEA">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-admin-primary">Add Category</button>
-                </div>
-            </div>
+            @endif
         </div>
     </div>
 @endsection
 
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle status toggle
+        document.querySelectorAll('.status-toggle').forEach(function(toggle) {
+            toggle.addEventListener('change', function() {
+                const categoryId = this.getAttribute('data-category-id');
+                const badge = document.getElementById('statusBadge' + categoryId);
+                const checkbox = this;
 
+                // Show loading state
+                const originalChecked = this.checked;
+                this.disabled = true;
+
+                // Make AJAX request
+                fetch(`/admin/categories/${categoryId}/toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({})
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update badge
+                        if (data.is_active) {
+                            badge.className = 'badge ms-2 bg-success';
+                            badge.textContent = 'Active';
+                        } else {
+                            badge.className = 'badge ms-2 bg-secondary';
+                            badge.textContent = 'Inactive';
+                        }
+                        
+                        // Show success message
+                        showAlert('Category status updated successfully', 'success');
+                    } else {
+                        // Revert checkbox
+                        checkbox.checked = !originalChecked;
+                        showAlert(data.message || 'Failed to update category status', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    checkbox.checked = !originalChecked;
+                    showAlert('An error occurred while updating category status', 'danger');
+                })
+                .finally(() => {
+                    checkbox.disabled = false;
+                });
+            });
+        });
+    });
+
+    function showAlert(message, type) {
+        // Create alert element
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.setAttribute('role', 'alert');
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Insert at the top of content
+        const content = document.querySelector('.admin-main');
+        if (content) {
+            content.insertBefore(alertDiv, content.firstChild);
+            
+            // Auto dismiss after 3 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+    }
+</script>
+@endpush

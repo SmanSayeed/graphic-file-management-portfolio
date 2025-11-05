@@ -43,6 +43,12 @@
             <span class="menu-text">Projects</span>
         </a>
 
+        <a href="{{ route('admin.users.index') }}"
+            class="menu-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+            <i class="bi bi-people"></i>
+            <span class="menu-text">Users</span>
+        </a>
+
         <a href="{{ route('admin.contact.edit') }}"
             class="menu-item {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">
             <i class="bi bi-envelope"></i>

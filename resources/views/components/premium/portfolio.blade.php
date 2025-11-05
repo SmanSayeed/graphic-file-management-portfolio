@@ -15,10 +15,12 @@
         <!-- Portfolio Filters -->
         <div class="portfolio-filters">
             <button class="filter-btn-premium active" data-filter="*">All Projects</button>
-            <button class="filter-btn-premium" data-filter=".logo">Logos</button>
-            <button class="filter-btn-premium" data-filter=".social">Social Media</button>
-            <button class="filter-btn-premium" data-filter=".banner">Banners</button>
-            <button class="filter-btn-premium" data-filter=".ecommerce">E-commerce</button>
+            @if (isset($categories) && $categories->count() > 0)
+                @foreach ($categories as $category)
+                    <button class="filter-btn-premium"
+                        data-filter=".{{ $category->slug }}">{{ $category->name }}</button>
+                @endforeach
+            @endif
         </div>
 
         <!-- Portfolio Grid -->
@@ -28,17 +30,11 @@
             @endforeach
         </div>
 
-        <!-- Load More Button -->
-        <div class="text-center mt-5" id="loadMoreSection">
-            <button type="button" class="btn btn-premium btn-premium-primary btn-lg" id="loadMoreBtn"
-                onclick="loadMoreProjects()">
-                Load More Projects
-                <i class="bi bi-arrow-down ms-2"></i>
-            </button>
-            <p class="text-muted mt-3 d-none" id="noMoreProjects">
-                <i class="bi bi-check-circle me-2"></i>All projects loaded!
-            </p>
-        </div>
+        @if ($projects->count() === 0)
+            <div class="text-center py-5">
+                <p class="text-muted">No projects available at the moment.</p>
+            </div>
+        @endif
     </div>
 </section>
 
@@ -48,55 +44,54 @@
 <script>
     // Store projects data globally for modal
     window.projectsData = @json($projects);
-
-    // Additional projects for load more functionality
-    window.additionalProjects = [{
-            id: 10,
-            title: 'Business Card Design',
-            category: 'logo',
-            categoryName: 'Brand Identity',
-            description: 'Professional business card design with modern layout. Double-sided design with QR code integration.',
-            image: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            type: 'free',
-            downloads: {
-                png: '#download-png-10',
-                source: '#download-ai-10',
-                sourceType: 'Adobe Illustrator (AI)'
-            }
-        },
-        {
-            id: 11,
-            title: 'Instagram Story Templates',
-            category: 'social',
-            categoryName: 'Social Media',
-            description: 'Complete Instagram story template pack with 15 unique designs. Perfect for influencers and brands.',
-            image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            type: 'paid',
-            downloads: {
-                png: '#download-png-11',
-                source: '#download-psd-11',
-                sourceType: 'Photoshop (PSD)'
-            }
-        },
-        {
-            id: 12,
-            title: 'YouTube Thumbnail Pack',
-            category: 'banner',
-            categoryName: 'Video Marketing',
-            description: 'Eye-catching YouTube thumbnail designs to boost your video views. 20 customizable templates included.',
-            image: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-            type: 'free',
-            downloads: {
-                png: '#download-png-12',
-                source: '#download-psd-12',
-                sourceType: 'Photoshop (PSD)'
-            }
-        }
-    ];
-
-    let currentLoadIndex = 0;
-    const loadMoreCount = 3;
     let currentProjectId = null;
+    let modalInstance = null;
+
+    // Cleanup function to remove modal backdrop
+    function cleanupModalBackdrop() {
+        // Remove any lingering backdrop elements
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+
+        // Remove modal-open class from body
+        document.body.classList.remove('modal-open');
+
+        // Reset body styles
+        document.body.style.paddingRight = '';
+        document.body.style.overflow = '';
+    }
+
+    // Cleanup on page load in case of any lingering backdrops
+    document.addEventListener('DOMContentLoaded', function() {
+        cleanupModalBackdrop();
+    });
+
+    // Convert YouTube URL to embed format
+    function convertYouTubeUrl(url) {
+        if (!url) return null;
+
+        // Handle different YouTube URL formats
+        let videoId = null;
+
+        // Standard YouTube URL: https://www.youtube.com/watch?v=VIDEO_ID
+        if (url.includes('youtube.com/watch?v=')) {
+            videoId = url.split('v=')[1].split('&')[0];
+        }
+        // Short YouTube URL: https://youtu.be/VIDEO_ID
+        else if (url.includes('youtu.be/')) {
+            videoId = url.split('youtu.be/')[1].split('?')[0];
+        }
+        // Already embed format: https://www.youtube.com/embed/VIDEO_ID
+        else if (url.includes('youtube.com/embed/')) {
+            return url;
+        }
+
+        if (videoId) {
+            return `https://www.youtube.com/embed/${videoId}`;
+        }
+
+        return null;
+    }
 
     // Open Project Modal with dynamic data
     async function openProjectModal(projectId) {
@@ -107,140 +102,121 @@
 
             // Set modal content
             document.getElementById('modalTitle').textContent = project.title;
-            document.getElementById('modalImage').src = project.thumbnail ? `/storage/${project.thumbnail}` :
-                'https://via.placeholder.com/800x600';
-            document.getElementById('modalImage').alt = project.title;
             document.getElementById('modalCategory').textContent = project.category?.name || 'Uncategorized';
             document.getElementById('modalType').textContent = project.type.toUpperCase();
+            document.getElementById('modalFileType').textContent = (project.file_type || 'IMAGE').toUpperCase();
             document.getElementById('modalDescription').textContent = project.description;
 
-            // Set type badge
+            // Set type badge (file_type instead of paid/free)
             const badge = document.getElementById('modalTypeBadge');
-            badge.textContent = project.type.toUpperCase();
-            badge.className = 'modal-type-badge ' + project.type;
+            const fileType = project.file_type || 'image';
+            badge.textContent = fileType.toUpperCase();
+            badge.className = 'modal-type-badge ' + fileType;
 
-            // Set download links
+            // Handle image or video display
+            const imageContainer = document.getElementById('modalImageContainer');
+            const videoContainer = document.getElementById('modalVideoContainer');
+            const modalImage = document.getElementById('modalImage');
+            const modalVideo = document.getElementById('modalVideo');
+
+            if (fileType === 'video' && project.video_link) {
+                // Show video
+                const embedUrl = convertYouTubeUrl(project.video_link);
+                if (embedUrl) {
+                    modalVideo.src = embedUrl;
+                    imageContainer.style.display = 'none';
+                    videoContainer.style.display = 'block';
+                } else {
+                    // Fallback to thumbnail if video link is invalid
+                    modalImage.src = project.thumbnail ? `/storage/${project.thumbnail}` :
+                        'https://via.placeholder.com/800x600';
+                    modalImage.alt = project.title;
+                    imageContainer.style.display = 'block';
+                    videoContainer.style.display = 'none';
+                }
+            } else {
+                // Show image
+                modalImage.src = project.thumbnail ? `/storage/${project.thumbnail}` :
+                    'https://via.placeholder.com/800x600';
+                modalImage.alt = project.title;
+                imageContainer.style.display = 'block';
+                videoContainer.style.display = 'none';
+                modalVideo.src = ''; // Clear video src
+            }
+
+            // Set download links with download tracking
             if (project.image) {
-                document.getElementById('downloadPNG').href = `/storage/${project.image}`;
-                document.getElementById('downloadPNG').style.display = 'block';
+                const downloadPNG = document.getElementById('downloadPNG');
+                downloadPNG.href = `/projects/${projectId}/download?type=image`;
+                downloadPNG.style.display = 'block';
+                // Download is tracked automatically when the file is served
             } else {
                 document.getElementById('downloadPNG').style.display = 'none';
             }
 
+            if (project.video) {
+                const downloadVideo = document.getElementById('downloadVideo');
+                downloadVideo.href = `/projects/${projectId}/download?type=video`;
+                downloadVideo.style.display = 'block';
+                // Show divider if there are other download options
+                const divider = document.getElementById('downloadDivider');
+                if (project.image || project.source_file) {
+                    divider.style.display = 'block';
+                }
+            } else {
+                document.getElementById('downloadVideo').style.display = 'none';
+            }
+
             if (project.source_file) {
-                document.getElementById('downloadSource').href = `/storage/${project.source_file}`;
-                document.getElementById('downloadSource').style.display = 'block';
+                const downloadSource = document.getElementById('downloadSource');
+                downloadSource.href = `/projects/${projectId}/download?type=source`;
+                downloadSource.style.display = 'block';
+                // Download is tracked automatically when the file is served
             } else {
                 document.getElementById('downloadSource').style.display = 'none';
             }
 
             // Update like button
-            updateLikeButton(project.like_count, project.is_liked);
+            updateLikeButton(project.like_count || 0, project.is_liked || false);
             document.getElementById('likeCount').textContent = project.like_count || 0;
 
+            // Cleanup any existing backdrop first
+            cleanupModalBackdrop();
+
+            // Get modal element
+            const modalElement = document.getElementById('portfolioModal');
+
+            // Dispose existing modal instance if any
+            if (modalInstance) {
+                try {
+                    modalInstance.dispose();
+                } catch (e) {
+                    // Ignore disposal errors
+                }
+            }
+
+            // Create new modal instance
+            modalInstance = new bootstrap.Modal(modalElement, {
+                backdrop: true,
+                keyboard: true,
+                focus: true
+            });
+
+            // Clean up backdrop when modal is fully hidden (after animation)
+            modalElement.addEventListener('hidden.bs.modal', function cleanup() {
+                cleanupModalBackdrop();
+                // Remove this listener to prevent memory leaks
+                modalElement.removeEventListener('hidden.bs.modal', cleanup);
+            });
+
             // Show modal
-            const modal = new bootstrap.Modal(document.getElementById('portfolioModal'));
-            modal.show();
+            modalInstance.show();
         } catch (error) {
             console.error('Error fetching project:', error);
             alert('Failed to load project details');
         }
     }
 
-    // Open Portfolio Modal Function (for static data)
-    function openPortfolioModal(project) {
-        // Set modal content
-        document.getElementById('modalTitle').textContent = project.title;
-        document.getElementById('modalImage').src = project.image;
-        document.getElementById('modalImage').alt = project.title;
-        document.getElementById('modalCategory').textContent = project.categoryName;
-        document.getElementById('modalType').textContent = project.type.toUpperCase();
-        document.getElementById('modalDescription').textContent = project.description;
-
-        // Set type badge
-        const badge = document.getElementById('modalTypeBadge');
-        badge.textContent = project.type.toUpperCase();
-        badge.className = 'modal-type-badge ' + project.type;
-
-        // Set download links
-        document.getElementById('downloadPNG').href = project.downloads.png;
-        document.getElementById('downloadSource').href = project.downloads.source;
-        document.getElementById('sourceFileType').textContent = project.downloads.sourceType;
-        document.getElementById('sourceFileName').textContent = project.downloads.sourceType.includes('AI') ?
-            'Illustrator File' : 'Photoshop File';
-
-        // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('portfolioModal'));
-        modal.show();
-
-        // Initialize dropdown after modal is shown
-        setTimeout(function() {
-            const dropdownButton = document.getElementById('dropdownMenuButton');
-            if (dropdownButton && typeof bootstrap !== 'undefined') {
-                new bootstrap.Dropdown(dropdownButton);
-            }
-        }, 100);
-    }
-
-    // Load More Projects Function
-    function loadMoreProjects() {
-        const portfolioGrid = document.querySelector('.portfolio-grid');
-        const loadMoreBtn = document.getElementById('loadMoreBtn');
-
-        // Calculate how many projects to load
-        const endIndex = Math.min(currentLoadIndex + loadMoreCount, window.additionalProjects.length);
-
-        // Add new projects
-        for (let i = currentLoadIndex; i < endIndex; i++) {
-            const project = window.additionalProjects[i];
-
-            // Create portfolio item HTML
-            const colDiv = document.createElement('div');
-            colDiv.className = `col-lg-4 col-md-6 portfolio-item ${project.category}`;
-            colDiv.style.opacity = '0';
-
-            colDiv.innerHTML = `
-                <div class="position-relative portfolio-card">
-                    <span class="portfolio-badge badge-${project.type === 'free' ? 'free' : 'paid'}">
-                        ${project.type.toUpperCase()}
-                    </span>
-                    <img src="${project.image}"
-                         alt="${project.title}"
-                         class="portfolio-image img-fluid rounded-4">
-                    <div class="portfolio-overlay">
-                        <h4>${project.title}</h4>
-                        <p class="portfolio-category">${project.categoryName}</p>
-                        <button class="btn-view-premium"
-                                onclick='openPortfolioModal(${JSON.stringify(project).replace(/'/g, "&apos;")})'>
-                            <i class="bi bi-eye me-2"></i>
-                            View Details
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            portfolioGrid.appendChild(colDiv);
-
-            // Fade in animation
-            setTimeout(() => {
-                colDiv.style.transition = 'opacity 0.5s ease';
-                colDiv.style.opacity = '1';
-            }, 100 * (i - currentLoadIndex));
-        }
-
-        currentLoadIndex = endIndex;
-
-        // Reinitialize Isotope
-        if (typeof $ !== 'undefined' && $.fn.isotope) {
-            $('.portfolio-grid').isotope('reloadItems').isotope();
-        }
-
-        // Check if all projects are loaded
-        if (currentLoadIndex >= window.additionalProjects.length) {
-            loadMoreBtn.classList.add('d-none');
-            document.getElementById('noMoreProjects').classList.remove('d-none');
-        }
-    }
 
     // Toggle Like Function
     async function toggleLike() {

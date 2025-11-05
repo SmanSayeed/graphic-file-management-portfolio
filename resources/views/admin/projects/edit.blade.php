@@ -170,8 +170,9 @@
                             </div>
                         @endif
                         <div class="mt-2">
-                            <label class="form-label-custom small">Or Enter Video Link (YouTube/Vimeo)</label>
-                            <input type="url" name="video_link" class="form-control form-control-custom" placeholder="https://..." value="{{ old('video_link', $project->video_link) }}">
+                            <label class="form-label-custom small">Or Enter Video Link (YouTube Only)</label>
+                            <input type="url" name="video_link" class="form-control form-control-custom" placeholder="https://www.youtube.com/watch?v=..." value="{{ old('video_link', $project->video_link) }}">
+                            <small class="text-muted">Only YouTube links are supported. Formats: youtube.com/watch?v=... or youtu.be/...</small>
                         </div>
                         @error('video')
                             <small class="text-danger">{{ $message }}</small>
@@ -238,13 +239,20 @@
         document.getElementById('fileType').addEventListener('change', function() {
             const imageSection = document.getElementById('imageFileSection');
             const videoSection = document.getElementById('videoFileSection');
+            const thumbnailInput = document.getElementById('thumbnailImage');
             
             if (this.value === 'image') {
                 imageSection.style.display = 'block';
                 videoSection.style.display = 'none';
+                if (thumbnailInput) {
+                    thumbnailInput.required = false; // Not required on edit if already exists
+                }
             } else if (this.value === 'video') {
                 imageSection.style.display = 'none';
                 videoSection.style.display = 'block';
+                if (thumbnailInput) {
+                    thumbnailInput.required = false;
+                }
             }
         });
     </script>

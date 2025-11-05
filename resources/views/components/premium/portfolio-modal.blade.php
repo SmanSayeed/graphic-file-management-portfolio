@@ -1,5 +1,5 @@
 <!-- Portfolio Modal -->
-<div class="modal fade" id="portfolioModal" tabindex="-1" aria-labelledby="portfolioModalLabel" aria-hidden="true">
+<div class="modal fade" id="portfolioModal" tabindex="-1" aria-labelledby="portfolioModalLabel" aria-hidden="true" data-bs-backdrop="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content portfolio-modal-content">
             <div class="modal-header border-0">
@@ -9,22 +9,31 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <!-- Project Image -->
+                <!-- Project Image/Video -->
                 <div class="modal-image-wrapper mb-4">
-                    <img id="modalImage" src="" class="img-fluid rounded-4 w-100" alt="Project Image">
+                    <div id="modalImageContainer">
+                        <img id="modalImage" src="" class="img-fluid rounded-4 w-100" alt="Project Image">
+                    </div>
+                    <div id="modalVideoContainer" style="display: none;">
+                        <iframe id="modalVideo" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="img-fluid rounded-4 w-100" style="min-height: 400px;"></iframe>
+                    </div>
                     <span id="modalTypeBadge" class="modal-type-badge"></span>
                 </div>
 
                 <!-- Project Details -->
                 <div class="project-details">
                     <div class="row mb-4">
-                        <div class="col-6">
+                        <div class="col-4">
                             <h6 class="detail-label">Category</h6>
                             <p class="fw-semibold mb-0" id="modalCategory"></p>
                         </div>
-                        <div class="col-6">
+                        <div class="col-4">
                             <h6 class="detail-label">Type</h6>
                             <p class="fw-semibold mb-0" id="modalType"></p>
+                        </div>
+                        <div class="col-4">
+                            <h6 class="detail-label">File Type</h6>
+                            <p class="fw-semibold mb-0" id="modalFileType"></p>
                         </div>
                     </div>
 
@@ -37,7 +46,7 @@
                         </button>
                         <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
                             <li>
-                                <a class="dropdown-item" href="#" id="downloadPNG">
+                                <a class="dropdown-item" href="#" id="downloadPNG" style="display: none;">
                                     <i class="bi bi-file-earmark-image text-primary me-2"></i>
                                     <div class="d-inline-block">
                                         <strong class="d-block">PNG Image</strong>
@@ -46,10 +55,19 @@
                                 </a>
                             </li>
                             <li>
-                                <hr class="dropdown-divider">
+                                <a class="dropdown-item" href="#" id="downloadVideo" style="display: none;">
+                                    <i class="bi bi-file-earmark-play text-danger me-2"></i>
+                                    <div class="d-inline-block">
+                                        <strong class="d-block">Video File</strong>
+                                        <small class="text-muted">Download Video</small>
+                                    </div>
+                                </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#" id="downloadSource">
+                                <hr class="dropdown-divider" id="downloadDivider" style="display: none;">
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#" id="downloadSource" style="display: none;">
                                     <i class="bi bi-file-earmark-zip text-success me-2"></i>
                                     <div class="d-inline-block">
                                         <strong class="d-block" id="sourceFileName">Source File</strong>
@@ -109,6 +127,22 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     }
 
+    #modalVideoContainer {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio */
+        height: 0;
+        overflow: hidden;
+    }
+
+    #modalVideoContainer iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
     .modal-type-badge {
         position: absolute;
         top: 15px;
@@ -120,6 +154,16 @@
         text-transform: uppercase;
         letter-spacing: 1px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-type-badge.image {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .modal-type-badge.video {
+        background: #ffc107;
+        color: #212529;
     }
 
     .modal-type-badge.free {

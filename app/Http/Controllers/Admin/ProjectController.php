@@ -38,7 +38,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $rules = [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'short_description' => 'required|string|max:255',
@@ -46,12 +46,23 @@ class ProjectController extends Controller
             'file_type' => 'required|in:image,video',
             'price' => 'nullable|numeric|min:0',
             'category_id' => 'required|exists:categories,id',
-            'thumbnail' => 'required|image|max:2048',
+            'thumbnail' => 'nullable|image|max:2048',
             'image' => 'nullable|image|max:5120',
             'source_file' => 'nullable|file|mimes:zip,rar,7z,psd,ai|max:10240',
             'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:10240',
-            'video_link' => 'nullable|url',
-        ]);
+            'video_link' => ['nullable', 'url', function ($attribute, $value, $fail) {
+                if ($value && !preg_match('/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/', $value)) {
+                    $fail('The video link must be a valid YouTube URL.');
+                }
+            }],
+        ];
+
+        // Make thumbnail required only if file_type is image
+        if ($request->file_type === 'image') {
+            $rules['thumbnail'] = 'required|image|max:2048';
+        }
+
+        $validated = $request->validate($rules);
 
         $validated['user_id'] = Auth::id();
         $validated['slug'] = Str::slug($validated['title']);
@@ -114,7 +125,11 @@ class ProjectController extends Controller
             'image' => 'nullable|image|max:5120',
             'source_file' => 'nullable|file|mimes:zip,rar,7z,psd,ai|max:10240',
             'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:10240',
-            'video_link' => 'nullable|url',
+            'video_link' => ['nullable', 'url', function ($attribute, $value, $fail) {
+                if ($value && !preg_match('/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/', $value)) {
+                    $fail('The video link must be a valid YouTube URL.');
+                }
+            }],
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);

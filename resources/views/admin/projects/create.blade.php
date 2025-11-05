@@ -14,8 +14,8 @@
 
                 <div class="row">
                     <!-- Thumbnail Image -->
-                    <div class="col-md-4 mb-4">
-                        <label class="form-label-custom">Thumbnail Image *</label>
+                    <div class="col-md-4 mb-4" id="thumbnailSection">
+                        <label class="form-label-custom">Thumbnail Image <span id="thumbnailRequired" style="color: red;">*</span></label>
                         <div class="image-preview" id="thumbnailPreview"
                             onclick="document.getElementById('thumbnailImage').click()">
                             <div class="text-center text-muted">
@@ -24,9 +24,10 @@
                                 <small>800x600px recommended</small>
                             </div>
                         </div>
-                        <input type="file" id="thumbnailImage" name="thumbnail" class="d-none" accept="image/*" required>
+                        <input type="file" id="thumbnailImage" name="thumbnail" class="d-none" accept="image/*">
+                        <small class="text-muted" id="thumbnailHint">Required for image projects</small>
                         @error('thumbnail')
-                            <small class="text-danger">{{ $message }}</small>
+                            <small class="text-danger d-block">{{ $message }}</small>
                         @enderror
                     </div>
 
@@ -149,9 +150,10 @@
                             <input type="file" id="videoFile" name="video" class="d-none" accept="video/*">
                         </div>
                         <div class="mt-2">
-                            <label class="form-label-custom small">Or Enter Video Link (YouTube/Vimeo)</label>
+                            <label class="form-label-custom small">Or Enter Video Link (YouTube Only)</label>
                             <input type="url" name="video_link" class="form-control form-control-custom"
-                                placeholder="https://..." value="{{ old('video_link') }}">
+                                placeholder="https://www.youtube.com/watch?v=..." value="{{ old('video_link') }}">
+                            <small class="text-muted">Only YouTube links are supported. Formats: youtube.com/watch?v=... or youtu.be/...</small>
                         </div>
                         @error('video')
                             <small class="text-danger">{{ $message }}</small>
@@ -208,13 +210,25 @@
             const imageSection = document.getElementById('imageFileSection');
             const videoSection = document.getElementById('videoFileSection');
             const sourceSection = document.getElementById('sourceFileSection');
+            const thumbnailSection = document.getElementById('thumbnailSection');
+            const thumbnailInput = document.getElementById('thumbnailImage');
+            const thumbnailRequired = document.getElementById('thumbnailRequired');
+            const thumbnailHint = document.getElementById('thumbnailHint');
 
             if (this.value === 'image') {
                 imageSection.style.display = 'block';
                 videoSection.style.display = 'none';
+                thumbnailSection.style.display = 'block';
+                thumbnailInput.required = true;
+                thumbnailRequired.style.display = 'inline';
+                thumbnailHint.textContent = 'Required for image projects';
             } else if (this.value === 'video') {
                 imageSection.style.display = 'none';
                 videoSection.style.display = 'block';
+                thumbnailSection.style.display = 'block';
+                thumbnailInput.required = false;
+                thumbnailRequired.style.display = 'none';
+                thumbnailHint.textContent = 'Optional - used as fallback if video link fails';
             }
 
             // Always show source file section

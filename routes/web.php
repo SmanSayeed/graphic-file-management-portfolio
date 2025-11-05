@@ -17,6 +17,9 @@ Route::get('/project/{project}', [HomeController::class, 'getProject'])->name('p
 Route::post('/projects/{project}/like', [LikeController::class, 'toggleLike'])->name('projects.like');
 Route::get('/projects/{project}/like-status', [LikeController::class, 'checkLike'])->name('projects.like.status');
 
+// Download Route
+Route::get('/projects/{project}/download', [HomeController::class, 'download'])->name('projects.download');
+
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -31,13 +34,8 @@ Route::get('/admin-login', [AuthController::class, 'showLogin'])->name('admin.lo
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:root_admin,admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('/sliders', function () {
-        return view('admin.sliders.index');
-    })->name('sliders.index');
-
-    Route::get('/sliders/create', function () {
-        return view('admin.sliders.create');
-    })->name('sliders.create');
+    // Slider Management
+    Route::resource('sliders', \App\Http\Controllers\Admin\AdminSliderController::class);
 
     // Profile Management
     Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile.show');
@@ -67,8 +65,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:root_admin,adm
 
     // User Management
     Route::resource('users', UserController::class);
+    Route::post('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
 
-    Route::get('/categories', function () {
-        return view('admin.categories.index');
-    })->name('categories.index');
+    // Category Management
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+    Route::post('/categories/{category}/toggle-status', [\App\Http\Controllers\Admin\CategoryController::class, 'toggleStatus'])->name('categories.toggle-status');
 });

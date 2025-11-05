@@ -8,18 +8,38 @@
     $projectCategoryName = is_object($project)
         ? $project->category->name ?? 'Uncategorized'
         : $project['categoryName'] ?? 'Uncategorized';
-    $projectType = is_object($project) ? $project->type : $project['type'];
-    $projectImage = is_object($project)
-        ? asset('storage/' . $project->thumbnail)
-        : $project['image'] ?? 'https://via.placeholder.com/800x600';
+    $projectFileType = is_object($project) ? $project->file_type : ($project['file_type'] ?? 'image');
+    $projectThumbnail = is_object($project) ? $project->thumbnail : ($project['thumbnail'] ?? null);
+    $projectVideoLink = is_object($project) ? $project->video_link : ($project['video_link'] ?? null);
+    $projectImage = is_object($project) && $projectThumbnail
+        ? asset('storage/' . $projectThumbnail)
+        : ($project['image'] ?? 'https://via.placeholder.com/800x600');
 @endphp
 
 <div class="col-lg-4 col-md-6 portfolio-item {{ $projectCategory }}" style="padding-left: 10px; padding-right: 10px;">
     <div class="position-relative portfolio-card">
-        <span class="portfolio-badge badge-{{ $projectType === 'free' ? 'free' : 'paid' }}">
-            {{ strtoupper($projectType) }}
+        <span class="portfolio-badge badge-{{ $projectFileType === 'image' ? 'image' : 'video' }}">
+            {{ strtoupper($projectFileType) }}
         </span>
-        <img src="{{ $projectImage }}" alt="{{ $projectTitle }}" class="portfolio-image img-fluid rounded-4">
+        @if($projectFileType === 'video' && $projectVideoLink)
+            @php
+                $embedUrl = $projectVideoLink;
+                if (str_contains($embedUrl, 'youtube.com/watch?v=')) {
+                    $videoId = explode('v=', $embedUrl)[1];
+                    $videoId = explode('&', $videoId)[0];
+                    $embedUrl = 'https://www.youtube.com/embed/' . $videoId;
+                } elseif (str_contains($embedUrl, 'youtu.be/')) {
+                    $videoId = explode('youtu.be/', $embedUrl)[1];
+                    $videoId = explode('?', $videoId)[0];
+                    $embedUrl = 'https://www.youtube.com/embed/' . $videoId;
+                }
+            @endphp
+            <div class="portfolio-video-wrapper">
+                <iframe src="{{ $embedUrl }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="portfolio-image img-fluid rounded-4"></iframe>
+            </div>
+        @else
+            <img src="{{ $projectImage }}" alt="{{ $projectTitle }}" class="portfolio-image img-fluid rounded-4">
+        @endif
         <div class="portfolio-overlay">
             <h4>{{ $projectTitle }}</h4>
             <p class="portfolio-category">{{ $projectCategoryName }}</p>
@@ -49,6 +69,30 @@
         height: 300px;
         object-fit: cover;
         display: block;
+    }
+
+    .portfolio-video-wrapper {
+        width: 100%;
+        height: 300px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .portfolio-video-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .portfolio-badge.badge-image {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .portfolio-badge.badge-video {
+        background: #ffc107;
+        color: #212529;
     }
 
     .btn-view-premium {

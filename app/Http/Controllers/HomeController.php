@@ -8,6 +8,7 @@ use App\Models\FooterContent;
 use App\Models\PersonalInfo;
 use App\Models\Project;
 use App\Models\Skill;
+use App\Models\Slider;
 use App\Models\SocialLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +26,7 @@ class HomeController extends Controller
             ->latest()
             ->get();
 
+        $sliders = Slider::active()->ordered()->get();
         $personalInfo = PersonalInfo::first();
         $skills = Skill::active()->ordered()->get();
         $contactInfo = ContactInfo::first();
@@ -34,6 +36,7 @@ class HomeController extends Controller
         return view('welcome', compact(
             'categories',
             'projects',
+            'sliders',
             'personalInfo',
             'skills',
             'contactInfo',
@@ -57,5 +60,46 @@ class HomeController extends Controller
         $projectData['like_count'] = $project->like_count;
 
         return response()->json($projectData);
+    }
+
+    /**
+     * Download project file
+     */
+    public function download(Project $project, Request $request)
+    {
+        $type = $request->query('type', 'image');
+
+        $filePath = null;
+        $fileName = null;
+
+        switch ($type) {
+            case 'image':
+                if ($project->image) {
+                    $filePath = storage_path('app/public/' . $project->image);
+                    $fileName = basename($project->image);
+                }
+                break;
+            case 'video':
+                if ($project->video) {
+                    $filePath = storage_path('app/public/' . $project->video);
+                    $fileName = basename($project->video);
+                }
+                break;
+            case 'source':
+                if ($project->source_file) {
+                    $filePath = storage_path('app/public/' . $project->source_file);
+                    $fileName = basename($project->source_file);
+                }
+                break;
+        }
+
+        if ($filePath && file_exists($filePath)) {
+            // Increment download count
+            $project->incrementDownloadCount();
+
+            return response()->download($filePath, $fileName);
+        }
+
+        abort(404, 'File not found');
     }
 }

@@ -32,6 +32,7 @@
                             <th>Type</th>
                             <th>File Type</th>
                             <th>Downloads</th>
+                            <th>Likes</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -67,7 +68,12 @@
                                         <span class="badge bg-warning">VIDEO</span>
                                     @endif
                                 </td>
-                                <td>{{ number_format($project->download_count) }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ number_format($project->download_count) }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger">{{ number_format($project->like_count) }}</span>
+                                </td>
                                 <td>
                                     @if ($project->is_active)
                                         <span class="badge bg-success">Active</span>
@@ -76,24 +82,30 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.projects.edit', $project->id) }}"
-                                        class="btn btn-sm btn-outline-primary" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form action="{{ route('admin.projects.destroy', $project->id) }}" method="POST"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Are you sure you want to delete this project?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('admin.projects.show', $project->id) }}"
+                                            class="btn btn-sm btn-outline-info" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.projects.edit', $project->id) }}"
+                                            class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="{{ route('admin.projects.destroy', $project->id) }}" method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to delete this project?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center py-4">
+                                <td colspan="9" class="text-center py-4">
                                     <p class="text-muted mb-0">No projects found. <a
                                             href="{{ route('admin.projects.create') }}">Create your first project</a></p>
                                 </td>
