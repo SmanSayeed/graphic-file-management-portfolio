@@ -280,6 +280,28 @@ class SiteOptimizationController extends Controller
     }
 
     /**
+     * Run database migrations
+     */
+    public function runMigrations()
+    {
+        try {
+            Artisan::call('migrate', ['--force' => true]);
+            $output = trim(Artisan::output());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Migrations completed successfully.',
+                'output' => $output ?: 'All migrations have been run.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Migration failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Show optimization page
      */
     public function index()
@@ -290,9 +312,20 @@ class SiteOptimizationController extends Controller
         // Check if storage directory exists
         $storageExists = Storage::disk('public')->exists('');
 
+        // Check migration status
+        try {
+            Artisan::call('migrate:status');
+            $migrationStatus = trim(Artisan::output());
+            $hasPendingMigrations = str_contains($migrationStatus, 'Pending');
+        } catch (\Exception $e) {
+            $hasPendingMigrations = true;
+            $migrationStatus = 'Unable to check migration status.';
+        }
+
         return view('admin.optimization.index', [
             'storageLinkExists' => $storageLinkExists,
             'storageExists' => $storageExists,
+            'hasPendingMigrations' => $hasPendingMigrations ?? true,
         ]);
     }
 }

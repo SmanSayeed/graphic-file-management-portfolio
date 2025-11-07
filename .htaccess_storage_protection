@@ -1,0 +1,12 @@
+# Place this .htaccess file in storage/app/public/ folder
+# This prevents direct access to files in storage (optional security measure)
+
+# Deny all direct access
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule .* - [F,L]
+</IfModule>
+
+Order Deny,Allow
+Deny from all
+

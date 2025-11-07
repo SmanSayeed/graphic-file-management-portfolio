@@ -1,3 +1,6 @@
+# Laravel .htaccess for public_html root
+# Use this if you move public/ files to public_html/ root
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -53,3 +56,4 @@ Options -Indexes
     Order allow,deny
     Deny from all
 </FilesMatch>
+

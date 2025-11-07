@@ -63,6 +63,42 @@
             </div>
         </div>
 
+        <!-- Database Migrations Section -->
+        <div class="col-md-6 mb-4">
+            <div class="content-card">
+                <div class="card-header-custom">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="bi bi-database me-2"></i>Database Migrations
+                    </h5>
+                </div>
+                <div class="card-body-custom">
+                    <p class="text-muted">
+                        Run database migrations to create or update database tables. This is required after first deployment.
+                    </p>
+                    
+                    @if(isset($hasPendingMigrations) && $hasPendingMigrations)
+                        <div class="mb-3">
+                            <span class="badge bg-warning">
+                                <i class="bi bi-exclamation-triangle me-1"></i>Pending Migrations
+                            </span>
+                        </div>
+                    @else
+                        <div class="mb-3">
+                            <span class="badge bg-success">
+                                <i class="bi bi-check-circle me-1"></i>All Migrations Up to Date
+                            </span>
+                        </div>
+                    @endif
+
+                    <button type="button" class="btn btn-primary w-100" id="runMigrationsBtn">
+                        <i class="bi bi-arrow-repeat me-2"></i>Run Migrations
+                    </button>
+
+                    <div id="migrationsResult" class="mt-3" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Cache Optimization Section -->
         <div class="col-md-6 mb-4">
             <div class="content-card">
@@ -139,6 +175,56 @@
                 },
                 complete: function() {
                     btn.prop('disabled', false).html('<i class="bi bi-link-45deg me-2"></i>Create Storage Link');
+                }
+            });
+        });
+
+        // Run Migrations
+        $('#runMigrationsBtn').on('click', function() {
+            const btn = $(this);
+            const resultDiv = $('#migrationsResult');
+            
+            if (!confirm('Are you sure you want to run database migrations? This will modify your database structure.')) {
+                return;
+            }
+
+            btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Running...');
+
+            $.ajax({
+                url: '{{ route("admin.optimization.migrate") }}',
+                method: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        resultDiv.html(
+                            '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                            '<strong>Success!</strong> ' + response.message +
+                            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                            '</div>'
+                        ).show();
+                        // Reload page after 2 seconds to update status
+                        setTimeout(function() {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        resultDiv.html(
+                            '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                            '<strong>Error!</strong> ' + response.message +
+                            '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                            '</div>'
+                        ).show();
+                    }
+                },
+                error: function(xhr) {
+                    const message = xhr.responseJSON?.message || 'Failed to run migrations.';
+                    resultDiv.html(
+                        '<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                        '<strong>Error!</strong> ' + message +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                        '</div>'
+                    ).show();
+                },
+                complete: function() {
+                    btn.prop('disabled', false).html('<i class="bi bi-arrow-repeat me-2"></i>Run Migrations');
                 }
             });
         });
