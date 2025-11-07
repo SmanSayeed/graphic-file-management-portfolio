@@ -1,102 +1,92 @@
-<!-- Portfolio Modal -->
-<div class="modal fade" id="portfolioModal" tabindex="-1" aria-labelledby="portfolioModalLabel" aria-hidden="true"
-    data-bs-backdrop="true">
+<!-- Portfolio Modal - Bootstrap 5 + jQuery -->
+<div class="modal fade" id="portfolioModal" tabindex="-1" aria-labelledby="portfolioModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content portfolio-modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold" id="portfolioModalLabel">
-                    <span id="modalTitle"></span>
+            <div class="modal-header">
+                <h5 class="modal-title" id="portfolioModalLabel">
+                    <span id="modalTitle">Project Details</span>
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                    id="modalCloseBtn"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <!-- Desktop Layout: Image/Video (60%) + Details (40%) -->
-                <div class="row modal-main-content">
+                <div class="row">
                     <!-- Left Side: Image/Video (60%) -->
-                    <div class="col-lg-7 col-12 modal-media-section">
-                        <div class="modal-image-wrapper">
-                            <div id="modalImageContainer">
+                    <div class="col-lg-7 col-12 mb-4 mb-lg-0">
+                        <div class="modal-media-wrapper">
+                            <!-- Image Container -->
+                            <div id="modalImageContainer" class="modal-media-item">
                                 <img id="modalImage" src="" class="img-fluid rounded-4 w-100"
                                     alt="Project Image">
                             </div>
-                            <div id="modalVideoContainer" class="modal-video-container-hidden">
-                                <iframe id="modalVideo" src="" frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen class="img-fluid rounded-4 w-100"
-                                    style="width: 100%; height: 100%;"></iframe>
+                            <!-- Video Container -->
+                            <div id="modalVideoContainer" class="modal-media-item" style="display: none;">
+                                <div class="ratio ratio-16x9">
+                                    <iframe id="modalVideo" src="" frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen class="rounded-4"></iframe>
+                                </div>
                             </div>
-                            <span id="modalTypeBadge" class="modal-type-badge"></span>
+                            <!-- File Type Badge - Top Right -->
+                            <span id="modalFileTypeBadge" class="modal-type-badge modal-badge-file-type"></span>
+                            <!-- Type Badge - Bottom Right -->
+                            <span id="modalTypeBadge" class="modal-type-badge modal-badge-type"></span>
                         </div>
                     </div>
 
                     <!-- Right Side: Details (40%) -->
-                    <div class="col-lg-5 col-12 modal-details-section">
+                    <div class="col-lg-5 col-12">
                         <div class="project-details-sidebar">
                             <!-- Category, Type, File Type -->
-                            <div class="row mb-3">
-                                <div class="col-12 mb-3">
+                            <div class="mb-4">
+                                <div class="mb-3">
                                     <h6 class="detail-label">Category</h6>
-                                    <p class="fw-semibold mb-0" id="modalCategory"></p>
+                                    <p class="fw-semibold mb-0" id="modalCategory">-</p>
                                 </div>
-                                <div class="col-6 mb-3">
-                                    <h6 class="detail-label">Type</h6>
-                                    <p class="fw-semibold mb-0" id="modalType"></p>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <h6 class="detail-label">File Type</h6>
-                                    <p class="fw-semibold mb-0" id="modalFileType"></p>
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <h6 class="detail-label">Type</h6>
+                                        <p class="fw-semibold mb-0" id="modalType">-</p>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <h6 class="detail-label">File Type</h6>
+                                        <p class="fw-semibold mb-0" id="modalFileType">-</p>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Download Button - Bootstrap Default Dropdown -->
-                            <div class="dropdown mb-3">
-                                <button class="btn btn-primary dropdown-toggle w-100" type="button"
-                                    id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <!-- Download Button - Custom Dropdown -->
+                            <div class="custom-download-dropdown mb-3">
+                                <button class="custom-download-btn" type="button" id="downloadDropdownBtn">
                                     <i class="bi bi-download me-2"></i>
-                                    Download Files
+                                    <span>Download Files</span>
+                                    <i class="bi bi-chevron-down ms-2 dropdown-arrow"></i>
                                 </button>
-                                <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
-                                    <li>
-                                        <a class="dropdown-item" href="#" id="downloadPNG" style="display: none;">
-                                            <i class="bi bi-file-earmark-image text-primary me-2"></i>
-                                            <div class="d-inline-block">
-                                                <strong class="d-block">PNG Image</strong>
-                                                <small class="text-muted">High Quality Preview</small>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#" id="downloadVideo"
-                                            style="display: none;">
-                                            <i class="bi bi-file-earmark-play text-danger me-2"></i>
-                                            <div class="d-inline-block">
-                                                <strong class="d-block">Video File</strong>
-                                                <small class="text-muted">Download Video</small>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider" id="downloadDivider" style="display: none;">
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="#" id="downloadSource"
-                                            style="display: none;">
-                                            <i class="bi bi-file-earmark-zip text-success me-2"></i>
-                                            <div class="d-inline-block">
-                                                <strong class="d-block" id="sourceFileName">Source File</strong>
-                                                <small class="text-muted d-block" id="sourceFileType">AI / PSD
-                                                    File</small>
-                                            </div>
-                                        </a>
-                                    </li>
-                                </ul>
+                                <div class="custom-download-menu" id="downloadDropdownMenu">
+                                    <!-- Image Download (for file_type = image) -->
+                                    <a href="#" class="custom-download-item" id="downloadImage"
+                                        style="display: none;">
+                                        <i class="bi bi-file-earmark-image text-primary me-2"></i>
+                                        <div class="download-item-content">
+                                            <strong class="d-block" id="imageFileName">Image File</strong>
+                                            <small class="text-muted" id="imageFileType">Image</small>
+                                        </div>
+                                    </a>
+                                    <!-- Source File Download -->
+                                    <a href="#" class="custom-download-item" id="downloadSource"
+                                        style="display: none;">
+                                        <i class="bi bi-file-earmark-zip text-success me-2" id="sourceFileIcon"></i>
+                                        <div class="download-item-content">
+                                            <strong class="d-block" id="sourceFileName">Source File</strong>
+                                            <small class="text-muted d-block" id="sourceFileType">Source File</small>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
 
                             <!-- Like Button -->
                             <div class="mb-3">
-                                <button type="button" class="btn btn-outline-danger btn-lg w-100" id="likeButton"
-                                    onclick="toggleLike()">
+                                <button type="button" class="btn btn-outline-danger btn-lg w-100" id="likeButton">
                                     <i class="bi bi-heart" id="likeIcon"></i>
                                     <span id="likeText">Like</span>
                                     <span class="badge bg-danger" id="likeCount">0</span>
@@ -111,7 +101,7 @@
                     <div class="col-12">
                         <div class="project-description-section">
                             <h6 class="detail-label">Description</h6>
-                            <p class="mb-0" id="modalDescription"></p>
+                            <p class="mb-0" id="modalDescription">-</p>
                         </div>
                     </div>
                 </div>
@@ -132,141 +122,59 @@
         background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);
         color: white;
         padding: 20px 30px;
+        border: none;
     }
 
     .modal-header .modal-title {
         color: white !important;
         font-size: 22px;
+        font-weight: 700;
     }
 
     .modal-header .btn-close {
         filter: brightness(0) invert(1);
+        opacity: 1;
     }
 
-    .modal-main-content {
-        margin: 0;
-    }
-
-    .modal-media-section {
-        padding-right: 20px;
-    }
-
-    .modal-details-section {
-        padding-left: 20px;
-    }
-
-    .project-details-sidebar {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-    }
-
-    .modal-image-wrapper {
+    .modal-media-wrapper {
         position: relative;
         border-radius: 15px;
         overflow: hidden;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        min-height: 450px;
-        display: flex;
-        align-items: stretch;
+        min-height: 400px;
+        background: #f8f9fa;
+    }
+
+    .modal-media-item {
+        width: 100%;
+        height: 100%;
+        min-height: 400px;
     }
 
     #modalImageContainer {
-        width: 100%;
-        min-height: 450px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f8f9fa;
-        border-radius: 15px;
+        padding: 20px;
     }
 
     #modalImageContainer img {
-        width: 100%;
-        height: auto;
         max-height: 100%;
         object-fit: contain;
         border-radius: 15px;
     }
 
     #modalVideoContainer {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
         background: #000;
-        border-radius: 15px;
-        min-height: 450px;
-        display: none;
-        /* Default hidden */
-        visibility: hidden;
-        opacity: 0;
+        padding: 0;
     }
 
-    .modal-video-container-hidden {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        height: 0 !important;
-        min-height: 0 !important;
-        padding-bottom: 0 !important;
-    }
-
-    /* Show class MUST override hidden class - MAXIMUM SPECIFICITY */
-    #modalVideoContainer.show {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-
-    /* Use aspect ratio for desktop screens - ONLY when showing */
-    @media (min-width: 992px) {
-        #modalVideoContainer.show {
-            height: 0 !important;
-            padding-bottom: 56.25% !important;
-            /* 16:9 aspect ratio */
-            min-height: 0 !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-    }
-
-    #modalVideoContainer iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: none;
-        border-radius: 15px;
-        background: #000;
-    }
-
-    /* For mobile, use fixed height - ONLY when showing */
-    @media (max-width: 991.98px) {
-        #modalVideoContainer.show {
-            height: 300px !important;
-            padding-bottom: 0 !important;
-            min-height: 300px !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-
-        #modalVideoContainer.show iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
+    #modalVideoContainer .ratio {
+        min-height: 400px;
     }
 
     .modal-type-badge {
         position: absolute;
-        top: 15px;
-        right: 15px;
         padding: 8px 20px;
         border-radius: 50px;
         font-size: 12px;
@@ -274,6 +182,21 @@
         text-transform: uppercase;
         letter-spacing: 1px;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+    }
+
+    /* File Type Badge - Top Right */
+    .modal-badge-file-type {
+        top: 15px;
+        right: 15px;
+        bottom: auto;
+    }
+
+    /* Type Badge - Bottom Right */
+    .modal-badge-type {
+        top: auto;
+        bottom: 15px;
+        right: 15px;
     }
 
     .modal-type-badge.image {
@@ -296,16 +219,13 @@
         color: white;
     }
 
-    .project-details {
-        padding: 10px 0;
+    .project-details-sidebar {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
     }
 
-    .project-description-section {
-        padding-top: 20px;
-        border-top: 1px solid #e0e0e0;
-    }
-
-    /* Detail Labels - Bigger and Bolder */
     .detail-label {
         font-size: 16px;
         font-weight: 700;
@@ -315,102 +235,128 @@
         letter-spacing: 0.5px;
     }
 
-    /* Bootstrap Default Dropdown Styles */
-    .btn-primary {
-        background-color: #00B894 !important;
-        border-color: #00B894 !important;
+    .project-description-section {
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    /* Custom Download Dropdown Styles */
+    .custom-download-dropdown {
+        position: relative;
+        width: 100%;
+    }
+
+    .custom-download-btn {
+        width: 100%;
+        background-color: #00B894;
+        border: 2px solid #00B894;
+        color: white;
         padding: 12px 20px;
+        border-radius: 8px;
         font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
     }
 
-    .btn-primary:hover,
-    .btn-primary:focus,
-    .btn-primary:active {
-        background-color: #00a085 !important;
-        border-color: #00a085 !important;
+    .custom-download-btn:hover {
+        background-color: #00a085;
+        border-color: #00a085;
     }
 
-    .dropdown-menu {
-        border: 1px solid rgba(0, 0, 0, .15);
+    .custom-download-btn .dropdown-arrow {
+        transition: transform 0.3s ease;
+        font-size: 14px;
+    }
+
+    .custom-download-dropdown.active .custom-download-btn .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+    .custom-download-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.15);
         border-radius: 8px;
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
         padding: 8px;
-        z-index: 9999 !important;
-        position: absolute !important;
+        margin-top: 5px;
+        z-index: 1055;
+        display: none;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        max-height: 300px;
+        overflow-y: auto;
     }
 
-    .dropdown-menu.show {
+    .custom-download-dropdown.active .custom-download-menu {
         display: block;
+        opacity: 1;
+        transform: translateY(0);
     }
 
-    .dropdown-item {
-        padding: 12px 15px;
-        border-radius: 6px;
-        transition: background-color 0.2s ease;
+    .custom-download-item {
         display: flex;
         align-items: flex-start;
+        padding: 12px 15px;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #212529;
+        transition: background-color 0.2s ease;
         gap: 10px;
     }
 
-    .dropdown-item:hover,
-    .dropdown-item:focus {
+    .custom-download-item:hover {
         background-color: #f8f9fa;
+        color: #212529;
     }
 
-    .dropdown-item i {
+    .custom-download-item i {
         font-size: 22px;
         margin-top: 2px;
+        flex-shrink: 0;
     }
 
-    .dropdown-item strong {
+    .download-item-content {
+        flex: 1;
+    }
+
+    .download-item-content strong {
+        display: block;
         font-size: 14px;
         font-weight: 600;
+        margin-bottom: 2px;
     }
 
-    .dropdown-item small {
+    .download-item-content small {
         font-size: 12px;
+        color: #6c757d;
     }
 
-    .dropdown-divider {
+    .custom-download-divider {
         margin: 5px 0;
+        border: 0;
+        border-top: 1px solid #e0e0e0;
     }
 
-    /* Responsive - Mobile View */
     @media (max-width: 991.98px) {
-        .modal-media-section {
-            padding-right: 0;
-            margin-bottom: 20px;
-        }
-
-        .modal-details-section {
-            padding-left: 0;
-        }
-
-        .modal-image-wrapper {
+        .modal-media-wrapper {
             min-height: 300px;
         }
 
-        #modalImageContainer {
+        .modal-media-item {
             min-height: 300px;
         }
 
-        #modalVideoContainer {
+        #modalVideoContainer .ratio {
             min-height: 300px;
-            padding-bottom: 56.25%;
-            /* 16:9 aspect ratio for mobile */
-            height: 0;
-        }
-
-        #modalVideoContainer iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .project-details-sidebar {
-            height: auto;
         }
     }
 
@@ -419,29 +365,16 @@
             padding: 20px !important;
         }
 
-        .modal-image-wrapper {
+        .modal-media-wrapper {
             min-height: 250px;
         }
 
-        #modalImageContainer {
+        .modal-media-item {
             min-height: 250px;
         }
 
-        #modalVideoContainer {
+        #modalVideoContainer .ratio {
             min-height: 250px;
-        }
-
-        .detail-label {
-            font-size: 14px;
-        }
-
-        .btn-primary {
-            padding: 10px 15px;
-            font-size: 14px;
-        }
-
-        .dropdown-item {
-            padding: 10px 12px;
         }
     }
 </style>

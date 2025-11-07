@@ -20,8 +20,14 @@
 
 <div class="col-lg-4 col-md-6 portfolio-item {{ $projectCategory }}" style="padding-left: 10px; padding-right: 10px;">
     <div class="position-relative portfolio-card">
-        <span class="portfolio-badge badge-{{ $projectFileType === 'image' ? 'image' : 'video' }}">
+        <!-- File Type Badge - Top Right -->
+        <span
+            class="portfolio-badge portfolio-badge-file-type badge-{{ $projectFileType === 'image' ? 'image' : 'video' }}">
             {{ strtoupper($projectFileType) }}
+        </span>
+        <!-- Type Badge - Bottom Right -->
+        <span class="portfolio-badge portfolio-badge-type badge-{{ $projectType === 'free' ? 'free' : 'paid' }}">
+            {{ strtoupper($projectType) }}
         </span>
         @if ($projectFileType === 'video' && $projectVideoLink)
             @php
@@ -89,6 +95,32 @@
         display: block;
     }
 
+    /* Portfolio Badge Base - override premium-theme.css */
+    .portfolio-card .portfolio-badge {
+        position: absolute;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        z-index: 2;
+    }
+
+    /* File Type Badge - Top Right */
+    .portfolio-badge-file-type {
+        top: 20px !important;
+        right: 20px !important;
+        bottom: auto !important;
+    }
+
+    /* Type Badge - Bottom Right */
+    .portfolio-badge-type {
+        top: auto !important;
+        bottom: 20px !important;
+        right: 20px !important;
+    }
+
     .portfolio-badge.badge-image {
         background: #17a2b8;
         color: white;
@@ -100,13 +132,13 @@
     }
 
     .portfolio-badge.badge-free {
-        background: #17a2b8;
+        background: #00B894;
         color: white;
     }
 
     .portfolio-badge.badge-paid {
-        background: #ffc107;
-        color: #212529;
+        background: #FD79A8;
+        color: white;
     }
 
     .btn-view-premium {

@@ -97,6 +97,35 @@ class HomeController extends Controller
         // Triple-check critical fields are strings and not null
         $projectData['file_type'] = (string) ($project->file_type ?? 'image');
         $projectData['video_link'] = $project->video_link ? (string) $project->video_link : null;
+        
+        // Add file extensions for download display
+        $projectData['image_extension'] = $project->image ? strtoupper(pathinfo($project->image, PATHINFO_EXTENSION)) : null;
+        $projectData['thumbnail_extension'] = $project->thumbnail ? strtoupper(pathinfo($project->thumbnail, PATHINFO_EXTENSION)) : null;
+        $projectData['source_file_extension'] = $project->source_file ? strtoupper(pathinfo($project->source_file, PATHINFO_EXTENSION)) : null;
+        $projectData['video_extension'] = $project->video ? strtoupper(pathinfo($project->video, PATHINFO_EXTENSION)) : null;
+        
+        // Helper function to get file type name from extension
+        $getFileTypeName = function($extension) {
+            $types = [
+                'PSD' => 'Photoshop',
+                'AI' => 'Illustrator',
+                'ZIP' => 'ZIP Archive',
+                'RAR' => 'RAR Archive',
+                '7Z' => '7-Zip Archive',
+                'MP4' => 'MP4 Video',
+                'AVI' => 'AVI Video',
+                'MOV' => 'MOV Video',
+                'WMV' => 'WMV Video',
+                'PNG' => 'PNG Image',
+                'JPG' => 'JPG Image',
+                'JPEG' => 'JPEG Image',
+            ];
+            return $types[strtoupper($extension)] ?? strtoupper($extension) . ' File';
+        };
+        
+        $projectData['image_file_type'] = $projectData['image_extension'] ? $getFileTypeName($projectData['image_extension']) : null;
+        $projectData['source_file_type'] = $projectData['source_file_extension'] ? $getFileTypeName($projectData['source_file_extension']) : null;
+        $projectData['video_file_type'] = $projectData['video_extension'] ? $getFileTypeName($projectData['video_extension']) : null;
 
         return response()->json($projectData);
     }
@@ -131,9 +160,13 @@ class HomeController extends Controller
 
         switch ($type) {
             case 'image':
+                // Prefer image over thumbnail, but use thumbnail if image doesn't exist
                 if ($project->image) {
                     $filePath = storage_path('app/public/' . $project->image);
                     $fileName = basename($project->image);
+                } elseif ($project->thumbnail) {
+                    $filePath = storage_path('app/public/' . $project->thumbnail);
+                    $fileName = basename($project->thumbnail);
                 }
                 break;
             case 'video':
