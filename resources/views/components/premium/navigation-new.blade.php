@@ -4,7 +4,7 @@
         <nav class="navbar-premium-new">
             <div class="d-flex justify-content-between align-items-center w-100">
                 <!-- Logo (Left) -->
-                <a href="#home" class="logo-premium">
+                <a href="{{ route('home') }}#home" class="logo-premium">
                     @if (isset($siteSettings) && $siteSettings->logo)
                         <img src="{{ asset('storage/' . $siteSettings->logo) }}"
                             alt="{{ $siteSettings->site_name ?? 'Logo' }}"
@@ -21,16 +21,38 @@
                 <!-- Desktop Navigation (Right) -->
                 <ul class="nav-menu-premium">
                     <li class="nav-item-premium">
-                        <a href="#home" class="nav-link-premium active">Home</a>
+                        <a href="{{ route('home') }}#home" class="nav-link-premium {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
                     </li>
                     <li class="nav-item-premium">
-                        <a href="#about" class="nav-link-premium">About</a>
+                        <a href="{{ route('home') }}#about" class="nav-link-premium">About</a>
                     </li>
                     <li class="nav-item-premium">
-                        <a href="#portfolio" class="nav-link-premium">Works</a>
+                        <a href="{{ route('home') }}#portfolio" class="nav-link-premium">Works</a>
                     </li>
                     <li class="nav-item-premium">
-                        <a href="#contact" class="nav-link-premium">Contact</a>
+                        <div class="custom-category-dropdown">
+                            <button class="custom-category-btn" type="button" id="categoryDropdownBtn">
+                                Categories
+                                <i class="bi bi-chevron-down ms-2 category-dropdown-arrow"></i>
+                            </button>
+                            <div class="custom-category-menu" id="categoryDropdownMenu">
+                                @if (isset($categories) && $categories->count() > 0)
+                                    @foreach ($categories as $category)
+                                        <a href="{{ route('category.show', $category->slug) }}"
+                                            class="custom-category-item">
+                                            <i class="bi {{ $category->icon ?? 'bi-folder' }} me-2"
+                                                style="color: {{ $category->color ?? '#00B894' }};"></i>
+                                            {{ $category->name }}
+                                        </a>
+                                    @endforeach
+                                @else
+                                    <span class="custom-category-item text-muted">No categories available</span>
+                                @endif
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item-premium">
+                        <a href="{{ route('home') }}#contact" class="nav-link-premium">Contact</a>
                     </li>
                     @auth
                         <li class="nav-item-premium">
@@ -122,25 +144,46 @@
     <!-- Drawer Menu -->
     <ul class="drawer-menu">
         <li class="nav-item-premium">
-            <a href="#home" class="nav-link-premium active">
+            <a href="{{ route('home') }}#home" class="nav-link-premium {{ request()->routeIs('home') ? 'active' : '' }}">
                 <i class="bi bi-house-door"></i>
                 Home
             </a>
         </li>
         <li class="nav-item-premium">
-            <a href="#about" class="nav-link-premium">
+            <a href="{{ route('home') }}#about" class="nav-link-premium">
                 <i class="bi bi-person"></i>
                 About
             </a>
         </li>
         <li class="nav-item-premium">
-            <a href="#portfolio" class="nav-link-premium">
+            <a href="{{ route('home') }}#portfolio" class="nav-link-premium">
                 <i class="bi bi-grid-3x3-gap"></i>
                 Works
             </a>
         </li>
+        @if (isset($categories) && $categories->count() > 0)
+            <li class="nav-item-premium">
+                <a href="#" class="nav-link-premium" id="mobileCategoryToggle">
+                    <i class="bi bi-folder"></i>
+                    Categories
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul class="mobile-category-submenu" id="mobileCategorySubmenu">
+                    @foreach ($categories as $category)
+                        <li>
+                            <a href="{{ route('category.show', $category->slug) }}"
+                                class="nav-link-premium submenu-link">
+                                <i class="bi {{ $category->icon ?? 'bi-folder' }} me-2"
+                                    style="color: {{ $category->color ?? '#00B894' }};"></i>
+                                {{ $category->name }}
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </li>
+        @endif
         <li class="nav-item-premium">
-            <a href="#contact" class="nav-link-premium">
+            <a href="{{ route('home') }}#contact" class="nav-link-premium">
                 <i class="bi bi-envelope"></i>
                 Contact
             </a>

@@ -11,29 +11,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Fix mobile drawer close
-    const drawerClose = document.querySelector('.drawer-close');
-    const drawer = document.querySelector('.mobile-drawer');
-    const mobileToggle = document.querySelector('.mobile-menu-toggle');
-
-    if (drawerClose) {
-        drawerClose.addEventListener('click', function () {
-            drawer.classList.remove('active');
-        });
-    }
-
-    if (mobileToggle) {
-        mobileToggle.addEventListener('click', function () {
-            drawer.classList.toggle('active');
-        });
-    }
-
-    // Close drawer when clicking outside
-    document.addEventListener('click', function (e) {
-        if (!drawer.contains(e.target) && !mobileToggle.contains(e.target) && drawer.classList.contains('active')) {
-            drawer.classList.remove('active');
-        }
-    });
+    // Mobile drawer is handled by navigation-slider.js (jQuery)
+    // Removed duplicate handler to prevent conflicts
 });
 
 // Global Like Functionality

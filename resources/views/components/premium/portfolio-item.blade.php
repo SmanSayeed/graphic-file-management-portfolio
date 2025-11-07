@@ -20,8 +20,8 @@
 
 <div class="col-lg-4 col-md-6 portfolio-item {{ $projectCategory }}" style="padding-left: 10px; padding-right: 10px;">
     <div class="position-relative portfolio-card">
-        <span class="portfolio-badge badge-{{ $projectType === 'free' ? 'free' : 'paid' }}">
-            {{ strtoupper($projectType) }}
+        <span class="portfolio-badge badge-{{ $projectFileType === 'image' ? 'image' : 'video' }}">
+            {{ strtoupper($projectFileType) }}
         </span>
         @if ($projectFileType === 'video' && $projectVideoLink)
             @php

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 // Home Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/project/{project}', [HomeController::class, 'getProject'])->name('project.show');
+Route::get('/category/{slug}', [HomeController::class, 'categoryShow'])->name('category.show');
 
 // Like Routes
 Route::post('/projects/{project}/like', [LikeController::class, 'toggleLike'])->name('projects.like');

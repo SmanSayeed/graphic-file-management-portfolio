@@ -49,7 +49,13 @@
     </div>
 
     <!-- Navigation -->
-    @include('components.premium.navigation-new')
+    @php
+        // Ensure categories are available for navigation
+        if (!isset($categories)) {
+            $categories = \App\Models\Category::active()->get();
+        }
+    @endphp
+    @include('components.premium.navigation-new', ['categories' => $categories ?? []])
 
     <!-- Main Content -->
     <main>
@@ -86,11 +92,15 @@
     <!-- Custom User Dropdown JS -->
     <script src="{{ asset('js/custom-user-dropdown.js') }}"></script>
 
+    <!-- Category Dropdown JS -->
+    <script src="{{ asset('js/category-dropdown.js') }}"></script>
+
     <!-- Premium Theme JS -->
     <script src="{{ asset('js/premium-theme.js') }}"></script>
     <script src="{{ asset('js/navigation-slider.js') }}"></script>
     <script src="{{ asset('js/modal-dropdown-fix.js') }}"></script>
 
+    <!-- Page-specific scripts -->
     @stack('scripts')
 </body>
 

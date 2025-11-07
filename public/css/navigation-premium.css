@@ -545,6 +545,130 @@ html {
     }
 }
 
+/* Custom Category Dropdown */
+.custom-category-dropdown {
+    position: relative;
+}
+
+.custom-category-btn {
+    background: transparent;
+    color: #2D3436;
+    padding: 8px 15px;
+    border: none;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.custom-category-btn:hover {
+    color: #00B894;
+}
+
+.custom-category-btn .category-dropdown-arrow {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.custom-category-btn.active .category-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.custom-category-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    min-width: 250px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    padding: 8px 0;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.custom-category-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.custom-category-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #2D3436;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.custom-category-item:hover {
+    background: rgba(0, 184, 148, 0.1);
+    color: #00B894;
+    padding-left: 25px;
+}
+
+.custom-category-item i {
+    font-size: 18px;
+    width: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Mobile Category Submenu */
+.mobile-category-submenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.mobile-category-submenu.active {
+    max-height: 500px;
+}
+
+.mobile-category-submenu li {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-category-submenu .submenu-link {
+    padding-left: 40px;
+    font-size: 14px;
+}
+
+.mobile-category-submenu .submenu-link i {
+    font-size: 16px;
+}
+
+.mobile-category-submenu .bi-chevron-down.rotate {
+    transform: rotate(180deg);
+}
+
+/* Responsive Category Dropdown */
+@media (max-width: 991px) {
+    .custom-category-dropdown {
+        display: none;
+    }
+}
+
 /* Prevent scroll jump */
 section {
     scroll-margin-top: 70px;
