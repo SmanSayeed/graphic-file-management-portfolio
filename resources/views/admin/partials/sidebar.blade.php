@@ -81,6 +81,12 @@
             <span class="menu-text">Site Settings</span>
         </a>
 
+        <a href="{{ route('admin.optimization.index') }}"
+            class="menu-item {{ request()->routeIs('admin.optimization.*') ? 'active' : '' }}">
+            <i class="bi bi-lightning-charge"></i>
+            <span class="menu-text">Optimization</span>
+        </a>
+
         <hr style="border-color: rgba(255,255,255,0.1); margin: 20px;">
 
         <a href="{{ url('/') }}" class="menu-item" target="_blank">

@@ -84,4 +84,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:root_admin,adm
     // Site Settings
     Route::get('/settings', [\App\Http\Controllers\Admin\SiteSettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [\App\Http\Controllers\Admin\SiteSettingController::class, 'update'])->name('settings.update');
+
+    // Site Optimization
+    Route::get('/optimization', [\App\Http\Controllers\Admin\SiteOptimizationController::class, 'index'])->name('optimization.index');
+    Route::post('/optimization/storage-link', [\App\Http\Controllers\Admin\SiteOptimizationController::class, 'createStorageLink'])->name('optimization.storage-link');
+    Route::post('/optimization/clear', [\App\Http\Controllers\Admin\SiteOptimizationController::class, 'clearOptimization'])->name('optimization.clear');
+    Route::post('/optimization/cache', [\App\Http\Controllers\Admin\SiteOptimizationController::class, 'cacheOptimization'])->name('optimization.cache');
 });
