@@ -54,21 +54,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:root_admin,adm
     Route::put('/profile/password', [AdminProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::put('/profile/email', [AdminProfileController::class, 'updateEmail'])->name('profile.email.update');
 
-    Route::get('/skills', function () {
-        return view('admin.skills.index');
-    })->name('skills.index');
+    Route::resource('skills', \App\Http\Controllers\Admin\SkillController::class)->except(['show', 'create']);
 
-    Route::get('/contact', function () {
-        return view('admin.contact.edit');
-    })->name('contact.edit');
+    // Creative Studio Content
+    Route::get('/creative-studio', [\App\Http\Controllers\Admin\CreativeStudioController::class, 'edit'])->name('creative-studio.edit');
+    Route::put('/creative-studio', [\App\Http\Controllers\Admin\CreativeStudioController::class, 'update'])->name('creative-studio.update');
 
-    Route::get('/social-links', function () {
-        return view('admin.social.edit');
-    })->name('social.edit');
+    Route::get('/contact', [\App\Http\Controllers\Admin\ContactInfoController::class, 'edit'])->name('contact.edit');
+    Route::put('/contact', [\App\Http\Controllers\Admin\ContactInfoController::class, 'update'])->name('contact.update');
 
-    Route::get('/footer', function () {
-        return view('admin.footer.edit');
-    })->name('footer.edit');
+    Route::get('/social-links', [\App\Http\Controllers\Admin\SocialLinkController::class, 'edit'])->name('social.edit');
+    Route::put('/social-links', [\App\Http\Controllers\Admin\SocialLinkController::class, 'update'])->name('social.update');
+
+    Route::get('/footer', [\App\Http\Controllers\Admin\FooterContentController::class, 'edit'])->name('footer.edit');
+    Route::put('/footer', [\App\Http\Controllers\Admin\FooterContentController::class, 'update'])->name('footer.update');
 
     // Project Management
     Route::resource('projects', AdminProjectController::class);

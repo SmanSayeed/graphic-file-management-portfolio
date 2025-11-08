@@ -101,11 +101,8 @@ class DatabaseSeeder extends Seeder
 
         // Create Footer Content
         FooterContent::create([
-            'about_text' => 'We are a creative team passionate about delivering high-quality design solutions for businesses and individuals worldwide.',
-            'services' => "Web Design\nUI/UX Design\nBranding\nPrint Design\nLogo Design",
-            'copyright_text' => '© 2024 Graphic Portfolio. All rights reserved.',
-            'privacy_policy_url' => '/privacy-policy',
-            'terms_of_service_url' => '/terms-of-service',
+            'description' => 'We are a creative team passionate about delivering high-quality design solutions for businesses and individuals worldwide.',
+            'copyright_text' => '© ' . now()->format('Y') . ' Graphic Portfolio. All rights reserved.',
         ]);
     }
 }

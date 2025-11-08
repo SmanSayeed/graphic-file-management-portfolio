@@ -9,11 +9,11 @@
     <!-- Hero Slider -->
     @include('components.premium.hero-slider-new')
 
-    <!-- About Section -->
-    @include('components.premium.about')
-
     <!-- Portfolio Section -->
     @include('components.premium.portfolio')
+
+    <!-- About Section -->
+    @include('components.premium.about')
 
     <!-- Contact Section -->
     @include('components.premium.contact')

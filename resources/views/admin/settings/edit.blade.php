@@ -55,6 +55,36 @@
                         @enderror
                     </div>
 
+                    <!-- Favicon Upload -->
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label-custom">Favicon</label>
+                        <div class="image-preview mb-3 d-flex align-items-center gap-3">
+                            <div class="favicon-preview-wrapper"
+                                style="width: 64px; height: 64px; border: 1px dashed #ced4da; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;"
+                                onclick="document.getElementById('faviconFile').click()">
+                                @if ($settings->favicon)
+                                    <img src="{{ asset('storage/' . $settings->favicon) }}" alt="Site Favicon"
+                                        id="faviconPreviewImage"
+                                        style="width: 32px; height: 32px; object-fit: contain;">
+                                @else
+                                    <i class="bi bi-file-earmark-image text-muted" style="font-size: 24px;"></i>
+                                @endif
+                            </div>
+                            <div>
+                                <p class="mb-1 text-muted small">Recommended: square PNG or ICO (32×32 px or 64×64 px)</p>
+                                <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    onclick="document.getElementById('faviconFile').click()">Upload Favicon</button>
+                                <p class="mb-0 mt-2 small text-muted">This icon appears in the browser tab.</p>
+                            </div>
+                        </div>
+                        <input type="file" id="faviconFile" name="favicon" class="d-none" accept="image/*">
+                        @error('favicon')
+                            <small class="text-danger d-block">{{ $message }}</small>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="row">
                     <!-- Site Name -->
                     <div class="col-md-6 mb-4">
                         <label class="form-label-custom">Site Name *</label>
@@ -88,6 +118,23 @@
             reader.onload = function(event) {
                 const preview = document.getElementById('logoPreview');
                 preview.innerHTML = `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: contain; max-height: 200px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('faviconFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const previewImage = document.getElementById('faviconPreviewImage');
+                if (previewImage) {
+                    previewImage.src = event.target.result;
+                } else {
+                    const wrapper = document.querySelector('.favicon-preview-wrapper');
+                    wrapper.innerHTML = `<img src="${event.target.result}" id="faviconPreviewImage" style="width: 32px; height: 32px; object-fit: contain;">`;
+                }
             };
             reader.readAsDataURL(file);
         }

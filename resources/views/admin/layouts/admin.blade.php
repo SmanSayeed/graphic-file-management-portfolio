@@ -5,7 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin Dashboard') - Graphic Portfolio</title>
+    @php
+        $siteTitle = optional($siteSettings)->site_name ?? config('app.name', 'Graphic Portfolio');
+        $faviconUrl = optional($siteSettings)->favicon_url ?? asset('favicon.ico');
+    @endphp
+    <title>@yield('title', 'Admin Dashboard') - {{ $siteTitle }}</title>
+    <link rel="icon" href="{{ $faviconUrl }}">
 
     <!-- Google Fonts -->
     <link

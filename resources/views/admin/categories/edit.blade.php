@@ -45,10 +45,21 @@
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label class="form-label-custom">Icon (Bootstrap Icon) *</label>
-                        <input type="text" name="icon" class="form-control form-control-custom" 
-                               placeholder="e.g., bi-printer" value="{{ old('icon', $category->icon) }}" required>
-                        <small class="text-muted">Bootstrap Icons class name (e.g., bi-printer, bi-image, bi-palette)</small>
+                        <label class="form-label-custom d-flex justify-content-between align-items-center">
+                            <span>Icon (Bootstrap Icon) *</span>
+                            <a href="https://icons.getbootstrap.com/" target="_blank" rel="noopener" class="small text-decoration-none">
+                                Browse Icons <i class="bi bi-box-arrow-up-right ms-1"></i>
+                            </a>
+                        </label>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="icon-preview rounded-circle d-inline-flex align-items-center justify-content-center">
+                                <i id="categoryIconPreview" class="bi {{ old('icon', $category->icon) }}"></i>
+                            </span>
+                            <input type="text" name="icon" class="form-control form-control-custom"
+                                   placeholder="e.g., bi-printer" value="{{ old('icon', $category->icon) }}"
+                                   list="bootstrap-icon-list" required>
+                        </div>
+                        <small class="text-muted d-block mt-2">Enter a Bootstrap Icons class name (e.g., bi-printer, bi-image, bi-palette)</small>
                         @error('icon')
                             <small class="text-danger">{{ $message }}</small>
                         @enderror
@@ -101,6 +112,18 @@
     </div>
 @endsection
 
+@push('styles')
+<style>
+    .icon-preview {
+        width: 48px;
+        height: 48px;
+        background: rgba(13, 110, 253, 0.12);
+        color: #0d6efd;
+        font-size: 20px;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
     // Auto-generate slug from name (only if name changed)
@@ -130,6 +153,25 @@
             document.getElementById('colorPicker').value = this.value;
         }
     });
-</script>
-@endpush
 
+    const iconInput = document.querySelector('input[name="icon"]');
+    const iconPreview = document.getElementById('categoryIconPreview');
+    if (iconInput && iconPreview) {
+        iconInput.addEventListener('input', function () {
+            iconPreview.className = `bi ${this.value.trim() || 'bi-grid'}`;
+        });
+    }
+</script>
+<datalist id="bootstrap-icon-list">
+    <option value="bi-brush"></option>
+    <option value="bi-images"></option>
+    <option value="bi-grid"></option>
+    <option value="bi-palette"></option>
+    <option value="bi-vector-pen"></option>
+    <option value="bi-camera"></option>
+    <option value="bi-printer"></option>
+    <option value="bi-droplet"></option>
+    <option value="bi-badge-hd"></option>
+    <option value="bi-easel"></option>
+</datalist>
+@endpush

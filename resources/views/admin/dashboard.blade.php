@@ -4,6 +4,26 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
+    @php
+        $totalProjects = $stats['total_projects'] ?? 0;
+        $activeProjects = $stats['active_projects'] ?? 0;
+        $activePercentage = $totalProjects > 0 ? round(($activeProjects / $totalProjects) * 100) : 0;
+
+        $paidProjects = $stats['paid_projects'] ?? 0;
+        $freeProjects = $stats['free_projects'] ?? 0;
+        $projectTypeTotal = $paidProjects + $freeProjects;
+        $paidPercentage = $projectTypeTotal > 0 ? round(($paidProjects / $projectTypeTotal) * 100) : 0;
+        $freePercentage = $projectTypeTotal > 0 ? round(($freeProjects / $projectTypeTotal) * 100) : 0;
+
+        $imageProjects = $stats['image_projects'] ?? 0;
+        $videoProjects = $stats['video_projects'] ?? 0;
+        $fileTypeTotal = $imageProjects + $videoProjects;
+        $imagePercentage = $fileTypeTotal > 0 ? round(($imageProjects / $fileTypeTotal) * 100) : 0;
+        $videoPercentage = $fileTypeTotal > 0 ? round(($videoProjects / $fileTypeTotal) * 100) : 0;
+
+        $storagePercentage = $systemStats['storage_percentage'] ?? 0;
+    @endphp
+
     <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
         <div class="col-lg-3 col-md-6">
@@ -11,7 +31,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted mb-1">Total Projects</p>
-                        <h3 class="fw-bold mb-0">24</h3>
+                        <h3 class="fw-bold mb-0">{{ number_format($stats['total_projects'] ?? 0) }}</h3>
                     </div>
                     <div class="stats-icon primary">
                         <i class="bi bi-folder"></i>
@@ -25,7 +45,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted mb-1">Categories</p>
-                        <h3 class="fw-bold mb-0">5</h3>
+                        <h3 class="fw-bold mb-0">{{ number_format($stats['total_categories'] ?? 0) }}</h3>
                     </div>
                     <div class="stats-icon success">
                         <i class="bi bi-grid"></i>
@@ -39,7 +59,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted mb-1">Total Downloads</p>
-                        <h3 class="fw-bold mb-0">1,248</h3>
+                        <h3 class="fw-bold mb-0">{{ number_format($stats['total_downloads'] ?? 0) }}</h3>
                     </div>
                     <div class="stats-icon warning">
                         <i class="bi bi-download"></i>
@@ -53,7 +73,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <p class="text-muted mb-1">Hero Sliders</p>
-                        <h3 class="fw-bold mb-0">5</h3>
+                        <h3 class="fw-bold mb-0">{{ number_format($stats['hero_sliders'] ?? 0) }}</h3>
                     </div>
                     <div class="stats-icon danger">
                         <i class="bi bi-images"></i>
@@ -83,60 +103,44 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <img src="https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=100&h=100&fit=crop"
-                                    alt="Project" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
-                            </td>
-                            <td class="fw-semibold">Modern Logo Design</td>
-                            <td><span class="badge bg-primary">Logo</span></td>
-                            <td><span class="badge bg-success">FREE</span></td>
-                            <td>2,543</td>
-                            <td>
-                                <a href="{{ route('admin.projects.edit', 1) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <img src="https://images.unsplash.com/photo-1611262588024-d12430b98920?w=100&h=100&fit=crop"
-                                    alt="Project" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
-                            </td>
-                            <td class="fw-semibold">Social Media Pack</td>
-                            <td><span class="badge bg-info">Social</span></td>
-                            <td><span class="badge bg-danger">PAID</span></td>
-                            <td>1,876</td>
-                            <td>
-                                <a href="{{ route('admin.projects.edit', 2) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=100&h=100&fit=crop"
-                                    alt="Project" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
-                            </td>
-                            <td class="fw-semibold">Promotional Banner</td>
-                            <td><span class="badge bg-warning">Banner</span></td>
-                            <td><span class="badge bg-success">FREE</span></td>
-                            <td>1,432</td>
-                            <td>
-                                <a href="{{ route('admin.projects.edit', 3) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
+                        @forelse ($recentProjects as $project)
+                            @php
+                                $imagePath = $project->thumbnail ?? $project->image;
+                                $imageUrl = $imagePath ? asset('storage/' . $imagePath) : 'https://via.placeholder.com/100x100?text=No+Image';
+                                $typeBadgeClass = $project->type === 'paid' ? 'bg-danger' : 'bg-success';
+                            @endphp
+                            <tr>
+                                <td>
+                                    <img src="{{ $imageUrl }}" alt="{{ $project->title }}" class="rounded"
+                                        style="width: 50px; height: 50px; object-fit: cover;">
+                                </td>
+                                <td class="fw-semibold">{{ $project->title }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ $project->category?->name ?? 'Uncategorized' }}</span>
+                                </td>
+                                <td><span class="badge {{ $typeBadgeClass }}">{{ strtoupper($project->type) }}</span></td>
+                                <td>{{ number_format($project->download_count ?? 0) }}</td>
+                                <td>
+                                    <a href="{{ route('admin.projects.edit', $project) }}"
+                                        class="btn btn-sm btn-outline-primary" title="Edit project">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ route('admin.projects.destroy', $project) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this project?');" title="Delete project">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">No projects found.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -175,23 +179,75 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Storage Used</span>
-                            <span class="fw-semibold">2.4 GB / 10 GB</span>
+                            <span class="fw-semibold">
+                                {{ $systemStats['storage_used_formatted'] ?? '0 B' }}
+                                /
+                                {{ $systemStats['storage_capacity_formatted'] ?? '—' }}
+                            </span>
                         </div>
                         <div class="progress" style="height: 8px;">
                             <div class="progress-bar"
-                                style="width: 24%; background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);"></div>
+                                style="width: {{ $storagePercentage }}%; background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);">
+                            </div>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-muted">Total Files</span>
-                            <span class="fw-semibold">156 Files</span>
+                            <span class="fw-semibold">{{ number_format($systemStats['total_files'] ?? 0) }} Files</span>
                         </div>
                     </div>
-                    <div>
+                    <div class="mb-3">
                         <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Last Login</span>
-                            <span class="fw-semibold">Today, 10:30 AM</span>
+                            <span class="text-muted">Active Projects</span>
+                            <span class="fw-semibold">
+                                {{ number_format($activeProjects) }} / {{ number_format($totalProjects) }}
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: {{ $activePercentage }}%;"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Paid Projects</span>
+                            <span class="fw-semibold">{{ number_format($paidProjects) }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-danger" style="width: {{ $paidPercentage }}%;"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Free Projects</span>
+                            <span class="fw-semibold">{{ number_format($freeProjects) }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: {{ $freePercentage }}%;"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Image / Video Projects</span>
+                            <span class="fw-semibold">
+                                {{ number_format($imageProjects) }} / {{ number_format($videoProjects) }}
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" style="width: {{ $imagePercentage }}%;"></div>
+                            <div class="progress-bar bg-info" style="width: {{ $videoPercentage }}%;"></div>
+                        </div>
+                    </div>
+                    <div class="pt-2 border-top">
+                        <div class="d-flex justify-content-between mb-0">
+                            <span class="text-muted">Last Profile Update</span>
+                            <span class="fw-semibold">
+                                @if (!empty($systemStats['last_login']))
+                                    {{ $systemStats['last_login']->timezone(config('app.timezone'))->format('M d, Y g:i A') }}
+                                @else
+                                    —
+                                @endif
+                            </span>
                         </div>
                     </div>
                 </div>

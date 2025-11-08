@@ -39,6 +39,12 @@
             <span class="menu-text">Skills</span>
         </a>
 
+        <a href="{{ route('admin.creative-studio.edit') }}"
+            class="menu-item {{ request()->routeIs('admin.creative-studio.*') ? 'active' : '' }}">
+            <i class="bi bi-brush"></i>
+            <span class="menu-text">Creative Studio</span>
+        </a>
+
         <a href="{{ route('admin.categories.index') }}"
             class="menu-item {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
             <i class="bi bi-grid"></i>

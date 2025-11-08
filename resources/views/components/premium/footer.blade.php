@@ -1,10 +1,18 @@
 <footer class="footer-premium">
     <div class="container">
+        @php
+            $footerDetails = $footerContent ?? null;
+            $footerDescription = $footerDetails->description ?? 'Creating stunning designs that captivate and inspire.';
+            $footerCopyright = $footerDetails->copyright_text ?? '© ' . date('Y') . ' Graphic Portfolio. All rights reserved.';
+            $activeSocialLinks = isset($socialLinks) ? $socialLinks->filter(fn($link) => $link->is_active && $link->url) : collect();
+            $availableCategories = isset($categories) ? $categories : \App\Models\Category::active()->orderBy('name')->get();
+        @endphp
+
         <div class="row g-4">
             <div class="col-lg-4 mb-4">
                 <a href="{{ route('home') }}#home" style="text-decoration: none; color: inherit;">
                     @if(isset($siteSettings) && $siteSettings->logo)
-                        <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->site_name ?? 'Logo' }}" 
+                        <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->site_name ?? 'Logo' }}"
                              class="mb-3" style="height: 50px; width: auto; object-fit: contain;">
                     @else
                         <h3 class="display-font mb-3"
@@ -13,66 +21,50 @@
                         </h3>
                     @endif
                 </a>
-                <p class="mb-4">Creating stunning designs that captivate and inspire. Professional graphic design
-                    services for businesses and individuals worldwide.</p>
-                <div class="d-flex gap-2">
-                    <a href="#" class="btn btn-outline-light btn-sm">
-                        <i class="bi bi-twitter"></i>
-                    </a>
-                    <a href="#" class="btn btn-outline-light btn-sm">
-                        <i class="bi bi-instagram"></i>
-                    </a>
-                    <a href="#" class="btn btn-outline-light btn-sm">
-                        <i class="bi bi-linkedin"></i>
-                    </a>
-                    <a href="#" class="btn btn-outline-light btn-sm">
-                        <i class="bi bi-dribbble"></i>
-                    </a>
-                </div>
+                <p class="mb-4">{{ $footerDescription }}</p>
+                @if ($activeSocialLinks->isNotEmpty())
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach ($activeSocialLinks as $social)
+                            <a href="{{ $social->url }}" class="btn btn-outline-light btn-sm" target="_blank" rel="noopener"
+                               aria-label="{{ ucfirst($social->platform ?? 'social') }}">
+                                <i class="bi {{ $social->icon ?? 'bi-share' }}"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
-            <div class="col-lg-2 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 mb-4">
                 <h5 class="mb-3">Quick Links</h5>
                 <ul class="list-unstyled">
                     <li class="mb-2"><a href="{{ route('home') }}#home">Home</a></li>
                     <li class="mb-2"><a href="{{ route('home') }}#about">About</a></li>
-                    <li class="mb-2"><a href="{{ route('home') }}#portfolio">Portfolio</a></li>
+                    <li class="mb-2"><a href="{{ route('home') }}#portfolio">Works</a></li>
                     <li class="mb-2"><a href="{{ route('home') }}#contact">Contact</a></li>
                 </ul>
             </div>
 
             <div class="col-lg-3 col-md-6 mb-4">
-                <h5 class="mb-3">Services</h5>
+                <h5 class="mb-3">Categories</h5>
                 <ul class="list-unstyled">
-                    <li class="mb-2"><a href="#">Logo Design</a></li>
-                    <li class="mb-2"><a href="#">Brand Identity</a></li>
-                    <li class="mb-2"><a href="#">Social Media Graphics</a></li>
-                    <li class="mb-2"><a href="#">Print Design</a></li>
-                    <li class="mb-2"><a href="#">UI/UX Design</a></li>
+                    @forelse ($availableCategories as $category)
+                        <li class="mb-2">
+                            <a href="{{ route('category.show', $category->slug) }}">{{ $category->name }}</a>
+                        </li>
+                    @empty
+                        <li class="text-muted">No categories available</li>
+                    @endforelse
                 </ul>
-            </div>
-
-            <div class="col-lg-3 col-md-6 mb-4">
-                <h5 class="mb-3">Newsletter</h5>
-                <p class="mb-3">Subscribe to get the latest updates and free resources.</p>
-                <form class="d-flex">
-                    <input type="email" class="form-control me-2" placeholder="Your email"
-                        style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">
-                    <button type="submit" class="btn btn-light">
-                        <i class="bi bi-send"></i>
-                    </button>
-                </form>
             </div>
         </div>
 
-        <div class="row mt-4 pt-4 border-top border-secondary">
+        <div class="row mt-4 pt-4 border-top border-secondary align-items-center">
             <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
-                <p class="mb-0">&copy; 2025 Graphic Portfolio. All rights reserved.</p>
+                <p class="mb-0">{{ $footerCopyright }}</p>
             </div>
             <div class="col-md-6 text-center text-md-end">
-                <a href="#" class="me-3">Privacy Policy</a>
-                <a href="#" class="me-3">Terms of Service</a>
-                <a href="#">Sitemap</a>
+                <span class="text-white-50">Developed by <a href="https://sman.dev" target="_blank" rel="noopener"
+                        class="text-white text-decoration-none">sman.dev</a></span>
             </div>
         </div>
     </div>

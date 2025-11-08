@@ -6,13 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Graphic Portfolio - Premium Design Showcase')</title>
-    <meta name="description" content="@yield('description', 'Professional graphic design portfolio with premium quality designs, creative works, and downloadable resources.')">
+    @php
+        $siteTitle = optional($siteSettings)->site_name ?? config('app.name', 'Graphic Portfolio');
+        $faviconUrl = optional($siteSettings)->favicon_url ?? asset('favicon.ico');
+    @endphp
+    <title>@yield('title', $siteTitle)</title>
+    <meta name="description"
+        content="@yield('description', 'Professional graphic design portfolio with premium quality designs, creative works, and downloadable resources.')">
     <meta name="keywords" content="graphic design, portfolio, logo design, branding, creative agency">
-    <meta name="author" content="Graphic Portfolio">
+    <meta name="author" content="{{ $siteTitle }}">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="icon" href="{{ $faviconUrl }}">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -63,6 +68,14 @@
     </main>
 
     <!-- Footer -->
+    @php
+        if (!isset($footerContent)) {
+            $footerContent = \App\Models\FooterContent::first();
+        }
+        if (!isset($socialLinks)) {
+            $socialLinks = \App\Models\SocialLink::active()->get();
+        }
+    @endphp
     @include('components.premium.footer')
 
     <!-- Back to Top -->

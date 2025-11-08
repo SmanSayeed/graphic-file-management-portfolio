@@ -28,18 +28,26 @@ class SiteSettingController extends Controller
         $validated = $request->validate([
             'site_name' => 'required|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'favicon' => 'nullable|image|mimes:png,ico,jpg,jpeg,gif|max:1024',
         ]);
 
         // Handle logo upload
         if ($request->hasFile('logo')) {
-            // Delete old logo if exists
             if ($settings->logo) {
                 Storage::disk('public')->delete($settings->logo);
             }
             $validated['logo'] = $request->file('logo')->store('site', 'public');
         } else {
-            // Keep existing logo if no new file uploaded
             $validated['logo'] = $settings->logo;
+        }
+
+        if ($request->hasFile('favicon')) {
+            if ($settings->favicon) {
+                Storage::disk('public')->delete($settings->favicon);
+            }
+            $validated['favicon'] = $request->file('favicon')->store('site', 'public');
+        } else {
+            $validated['favicon'] = $settings->favicon;
         }
 
         $settings->update($validated);

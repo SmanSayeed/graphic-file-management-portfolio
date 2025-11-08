@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\ContactInfo;
+use App\Models\CreativeStudioSection;
 use App\Models\FooterContent;
 use App\Models\PersonalInfo;
 use App\Models\Project;
@@ -34,6 +35,7 @@ class HomeController extends Controller
         $socialLinks = SocialLink::active()->get();
         $footerContent = FooterContent::first();
         $siteSettings = SiteSetting::getSettings();
+        $creativeStudio = CreativeStudioSection::first();
 
         return view('welcome', compact(
             'categories',
@@ -44,6 +46,7 @@ class HomeController extends Controller
             'contactInfo',
             'socialLinks',
             'footerContent',
+            'creativeStudio',
             'siteSettings'
         ));
     }

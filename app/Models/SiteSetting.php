@@ -9,6 +9,7 @@ class SiteSetting extends Model
     protected $fillable = [
         'site_name',
         'logo',
+        'favicon',
     ];
 
     /**
@@ -23,6 +24,17 @@ class SiteSetting extends Model
     }
 
     /**
+     * Get the favicon URL.
+     */
+    public function getFaviconUrlAttribute(): ?string
+    {
+        if ($this->favicon) {
+            return asset('storage/' . $this->favicon);
+        }
+        return null;
+    }
+
+    /**
      * Get single instance (singleton pattern)
      */
     public static function getSettings()
@@ -30,6 +42,7 @@ class SiteSetting extends Model
         return static::first() ?? static::create([
             'site_name' => 'Creative Studio',
             'logo' => null,
+            'favicon' => null,
         ]);
     }
 }
