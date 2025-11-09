@@ -39,6 +39,33 @@
     padding: 60px 20px;
 }
 
+.hero-slide-title {
+    color: #ffffff;
+    font-size: 50px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+.hero-slide-subtitle {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    text-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.hero-slide-description {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.7;
+    max-width: 680px;
+    margin: 0 auto 20px auto;
+}
+
 /* View Projects Button */
 .btn-view-projects {
     background: linear-gradient(135deg, #00B894 0%, #F5576C 100%);
@@ -171,6 +198,18 @@
         min-height: 280px;
     }
 
+    .hero-slide-title {
+        font-size: 38px;
+    }
+
+    .hero-slide-subtitle {
+        font-size: 20px;
+    }
+
+    .hero-slide-description {
+        font-size: 16px;
+    }
+
     .carousel-hero .carousel-control-prev,
     .carousel-hero .carousel-control-next {
         width: 50px;
@@ -205,6 +244,18 @@
     .hero-slide-item {
         height: 42vh;
         min-height: 250px;
+    }
+
+    .hero-slide-title {
+        font-size: 28px;
+    }
+
+    .hero-slide-subtitle {
+        font-size: 18px;
+    }
+
+    .hero-slide-description {
+        font-size: 15px;
     }
 
     .carousel-hero .carousel-control-prev,

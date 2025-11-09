@@ -39,17 +39,17 @@
                                 <iframe src="{{ $embedUrl }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                             </div>
                         </div>
-                    @elseif($project->thumbnail)
+                    @elseif($project->thumbnail_url)
                         <div class="mb-4">
                             <h6 class="fw-bold mb-2">Thumbnail</h6>
-                            <img src="{{ asset('storage/' . $project->thumbnail) }}" alt="{{ $project->title }}" class="img-fluid rounded">
+                            <img src="{{ $project->thumbnail_url }}" alt="{{ $project->title }}" class="img-fluid rounded">
                         </div>
                     @endif
 
-                    @if($project->image)
+                    @if($project->image_url)
                         <div class="mb-4">
                             <h6 class="fw-bold mb-2">Project Image</h6>
-                            <img src="{{ asset('storage/' . $project->image) }}" alt="{{ $project->title }}" class="img-fluid rounded">
+                            <img src="{{ $project->image_url }}" alt="{{ $project->title }}" class="img-fluid rounded">
                         </div>
                     @endif
 
@@ -138,28 +138,28 @@
                         <h5 class="mb-0 fw-bold">Files</h5>
                     </div>
                     <div class="card-body-custom">
-                        @if($project->video)
+                        @if($project->video_url)
                             <div class="mb-3">
                                 <strong>Video File:</strong>
-                                <a href="{{ asset('storage/' . $project->video) }}" download class="btn btn-sm btn-outline-primary ms-2">
+                                <a href="{{ route('projects.download', ['project' => $project->id, 'type' => 'video']) }}" class="btn btn-sm btn-outline-primary ms-2">
                                     <i class="bi bi-download me-1"></i>Download
                                 </a>
                             </div>
                         @endif
 
-                        @if($project->source_file)
+                        @if($project->source_file_url)
                             <div class="mb-3">
                                 <strong>Source File:</strong>
-                                <a href="{{ asset('storage/' . $project->source_file) }}" download class="btn btn-sm btn-outline-success ms-2">
+                                <a href="{{ route('projects.download', ['project' => $project->id, 'type' => 'source']) }}" class="btn btn-sm btn-outline-success ms-2">
                                     <i class="bi bi-download me-1"></i>Download
                                 </a>
                             </div>
                         @endif
 
-                        @if($project->image)
+                        @if($project->image_url)
                             <div class="mb-3">
                                 <strong>Image File:</strong>
-                                <a href="{{ asset('storage/' . $project->image) }}" download class="btn btn-sm btn-outline-info ms-2">
+                                <a href="{{ route('projects.download', ['project' => $project->id, 'type' => 'image']) }}" class="btn btn-sm btn-outline-info ms-2">
                                     <i class="bi bi-download me-1"></i>Download
                                 </a>
                             </div>

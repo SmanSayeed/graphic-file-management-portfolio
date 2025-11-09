@@ -41,8 +41,8 @@
                         @forelse($projects as $project)
                             <tr>
                                 <td>
-                                    @if ($project->thumbnail)
-                                        <img src="{{ asset('storage/' . $project->thumbnail) }}" class="rounded"
+                                    @if ($project->thumbnail_url)
+                                        <img src="{{ $project->thumbnail_url }}" class="rounded"
                                             style="width: 60px; height: 60px; object-fit: cover;"
                                             alt="{{ $project->title }}">
                                     @else

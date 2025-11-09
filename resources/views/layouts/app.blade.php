@@ -4,8 +4,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Graphic Portfolio - Creative Design Showcase')</title>
-    <meta name="description" content="@yield('description', 'Professional graphic design portfolio showcasing creative works, logos, social media designs, and downloadable resources.')">
+    @php
+        $siteTitle = optional($siteSettings ?? null)->site_name ?? config('app.name', 'Graphic Portfolio');
+        $portfolioInfo = \App\Models\PersonalInfo::first();
+        $defaultDescription =
+            $portfolioInfo?->short_bio ??
+            ($portfolioInfo?->full_bio ??
+                'Professional graphic design portfolio showcasing creative works, logos, social media designs, and downloadable resources.');
+
+        $pageTitle = trim($__env->yieldContent('title')) ?: $siteTitle;
+        $pageDescription = trim($__env->yieldContent('description')) ?: $defaultDescription;
+    @endphp
+    <title>{{ $pageTitle }}</title>
+    <meta name="description" content="{{ $pageDescription }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

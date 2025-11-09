@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
+            'track.analytics' => \App\Http\Middleware\TrackAnalytics::class,
+        ]);
+        
+        $middleware->web(append: [
+            \App\Http\Middleware\TrackAnalytics::class,
         ]);
         
         // Set redirect route for unauthenticated users

@@ -1,9 +1,7 @@
 @extends('layouts.premium')
 
-@section('title', 'Graphic Portfolio - Premium Design Showcase')
-@section('description',
-    'Professional graphic design portfolio with premium quality designs, creative works, and
-    downloadable resources.')
+@section('title', optional($siteSettings)->site_name)
+@section('description', optional($personalInfo)->short_bio ?? optional($personalInfo)->full_bio)
 
 @section('content')
     <!-- Hero Slider -->

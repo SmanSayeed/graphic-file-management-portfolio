@@ -105,8 +105,7 @@
                     <tbody>
                         @forelse ($recentProjects as $project)
                             @php
-                                $imagePath = $project->thumbnail ?? $project->image;
-                                $imageUrl = $imagePath ? asset('storage/' . $imagePath) : 'https://via.placeholder.com/100x100?text=No+Image';
+                                $imageUrl = $project->thumbnail_url ?? $project->image_url ?? 'https://via.placeholder.com/100x100?text=No+Image';
                                 $typeBadgeClass = $project->type === 'paid' ? 'bg-danger' : 'bg-success';
                             @endphp
                             <tr>

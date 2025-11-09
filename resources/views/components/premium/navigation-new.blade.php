@@ -2,7 +2,7 @@
 <header class="header-premium">
     <div class="container">
         <nav class="navbar-premium-new">
-            <div class="d-flex justify-content-between align-items-center w-100">
+            <div class="d-flex justify-content-between align-items-center w-100 nav-top-row">
                 <!-- Logo (Left) -->
                 <a href="{{ route('home') }}#home" class="logo-premium">
                     @if (isset($siteSettings) && $siteSettings->logo)
@@ -21,7 +21,8 @@
                 <!-- Desktop Navigation (Right) -->
                 <ul class="nav-menu-premium">
                     <li class="nav-item-premium">
-                        <a href="{{ route('home') }}#home" class="nav-link-premium {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
+                        <a href="{{ route('home') }}#home"
+                            class="nav-link-premium {{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
                     </li>
                     <li class="nav-item-premium">
                         <a href="{{ route('home') }}#about" class="nav-link-premium">About</a>
@@ -53,6 +54,16 @@
                     </li>
                     <li class="nav-item-premium">
                         <a href="{{ route('home') }}#contact" class="nav-link-premium">Contact</a>
+                    </li>
+                    <li class="nav-item-premium nav-item-search">
+                        <form action="{{ route('works.index') }}" method="GET" class="nav-search-form"
+                            role="search">
+                            <input type="text" name="q" class="nav-search-input" placeholder="Search works..."
+                                value="{{ request()->query('q') }}" aria-label="Search works">
+                            <button type="submit" class="nav-search-btn">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
                     </li>
                     @auth
                         <li class="nav-item-premium">
@@ -141,10 +152,24 @@
         </button>
     </div>
 
+    <form action="{{ route('works.index') }}" method="GET" class="drawer-search-form" role="search">
+        <div class="drawer-search-inner">
+            <i class="bi bi-search"></i>
+            <input type="text" name="q" placeholder="Search works..." value="{{ request()->query('q') }}"
+                aria-label="Search works">
+            @if (request()->filled('q'))
+                <a href="{{ route('works.index') }}" class="drawer-search-clear" aria-label="Clear search">
+                    <i class="bi bi-x-circle"></i>
+                </a>
+            @endif
+        </div>
+    </form>
+
     <!-- Drawer Menu -->
     <ul class="drawer-menu">
         <li class="nav-item-premium">
-            <a href="{{ route('home') }}#home" class="nav-link-premium {{ request()->routeIs('home') ? 'active' : '' }}">
+            <a href="{{ route('home') }}#home"
+                class="nav-link-premium {{ request()->routeIs('home') ? 'active' : '' }}">
                 <i class="bi bi-house-door"></i>
                 Home
             </a>

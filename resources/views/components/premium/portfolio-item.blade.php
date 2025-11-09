@@ -10,12 +10,12 @@
         : $project['categoryName'] ?? 'Uncategorized';
     $projectType = is_object($project) ? $project->type : $project['type'] ?? 'free';
     $projectFileType = is_object($project) ? $project->file_type : $project['file_type'] ?? 'image';
-    $projectThumbnail = is_object($project) ? $project->thumbnail : $project['thumbnail'] ?? null;
+    $projectThumbnail = is_object($project) ? $project->thumbnail_url : $project['thumbnail_url'] ?? null;
     $projectVideoLink = is_object($project) ? $project->video_link : $project['video_link'] ?? null;
     $projectImage =
-        is_object($project) && $projectThumbnail
-            ? asset('storage/' . $projectThumbnail)
-            : $project['image'] ?? 'https://via.placeholder.com/800x600';
+        $projectThumbnail
+            ? $projectThumbnail
+            : (is_object($project) ? ($project->image_url ?? 'https://via.placeholder.com/800x600') : ($project['image'] ?? 'https://via.placeholder.com/800x600'));
 @endphp
 
 <div class="col-lg-4 col-md-6 portfolio-item {{ $projectCategory }}" style="padding-left: 10px; padding-right: 10px;">

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class Project extends Model
 {
@@ -27,7 +28,8 @@ class Project extends Model
         'user_id',
         'download_count',
         'like_count',
-        'is_active'
+        'is_active',
+        'storage_type',
     ];
 
     protected $casts = [
@@ -35,6 +37,14 @@ class Project extends Model
         'download_count' => 'integer',
         'like_count' => 'integer',
         'is_active' => 'boolean',
+        'storage_type' => 'string',
+    ];
+
+    protected $appends = [
+        'thumbnail_url',
+        'image_url',
+        'source_file_url',
+        'video_url',
     ];
 
     /**
@@ -171,5 +181,40 @@ class Project extends Model
     public function incrementDownloadCount()
     {
         $this->increment('download_count');
+    }
+
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        return $this->generateAssetUrl($this->thumbnail);
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->generateAssetUrl($this->image);
+    }
+
+    public function getSourceFileUrlAttribute(): ?string
+    {
+        return $this->generateAssetUrl($this->source_file);
+    }
+
+    public function getVideoUrlAttribute(): ?string
+    {
+        return $this->generateAssetUrl($this->video);
+    }
+
+    protected function generateAssetUrl(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+
+        $disk = $this->storage_type === 's3' ? 'project_s3' : 'project_local';
+
+        try {
+            return Storage::disk($disk)->url($path);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 }

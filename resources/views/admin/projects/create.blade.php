@@ -9,7 +9,7 @@
             <h5 class="mb-0 fw-bold">Project Details</h5>
         </div>
         <div class="card-body-custom">
-            <form method="POST" action="{{ route('admin.projects.store') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('admin.projects.store') }}" enctype="multipart/form-data" data-project-form="true">
                 @csrf
 
                 <div class="row">
@@ -24,7 +24,7 @@
                                 <small>800x600px recommended</small>
                             </div>
                         </div>
-                        <input type="file" id="thumbnailImage" name="thumbnail" class="d-none" accept="image/*">
+                        <input type="file" id="thumbnailImage" name="thumbnail" class="d-none" accept="image/*" data-has-existing="false">
                         <small class="text-muted" id="thumbnailHint">Required for image projects</small>
                         @error('thumbnail')
                             <small class="text-danger d-block">{{ $message }}</small>
@@ -68,6 +68,81 @@
                                 @error('type')
                                     <small class="text-danger">{{ $message }}</small>
                                 @enderror
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label-custom d-flex align-items-center gap-2">
+                                    Storage Location *
+                                    @if (!$s3Available)
+                                        <span class="badge bg-secondary">S3 disabled</span>
+                                    @endif
+                                    @if ($storageSettings->avoid_s3)
+                                        <span class="badge bg-warning text-dark">Avoiding S3</span>
+                                    @endif
+                                </label>
+                                <select name="storage_type" class="form-select form-control-custom" {{ !$s3Available ? 'disabled' : '' }}>
+                                    <option value="local" {{ old('storage_type', $storageSettings->default_storage_type) === 'local' ? 'selected' : '' }}>
+                                        Local Server Storage
+                                    </option>
+                                    <option value="s3"
+                                        {{ !$s3Available ? 'disabled' : '' }}
+                                        {{ old('storage_type', $storageSettings->default_storage_type) === 's3' && $s3Available ? 'selected' : '' }}>
+                                        AWS S3 Bucket
+                                    </option>
+                                </select>
+                                @if (!$s3Available)
+                                    <input type="hidden" name="storage_type" value="local">
+                                @endif
+                                @if (!$s3Available)
+                                    <small class="text-danger d-block mt-1">
+                                        Provide S3 credentials and ensure limits are within Free Tier to enable S3 uploads.
+                                    </small>
+                                @endif
+                                @php
+                                    $usage = $s3Snapshot;
+                                    $formatBytes = function ($bytes) {
+                                        if ($bytes <= 0) {
+                                            return '0 B';
+                                        }
+                                        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+                                        $power = min(floor(log($bytes, 1024)), count($units) - 1);
+                                        return round($bytes / pow(1024, $power), 2) . ' ' . $units[$power];
+                                    };
+                                @endphp
+                                <div class="alert alert-light border mt-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="fw-semibold">S3 Monthly Usage (Free Tier)</span>
+                                        @if ($usage['force_local'])
+                                            <span class="badge bg-danger">Limit Reached</span>
+                                        @endif
+                                    </div>
+                                    <ul class="list-unstyled small mb-0 mt-2">
+                                        <li>
+                                            Storage: {{ $formatBytes($usage['storage_bytes']) }} / {{ $formatBytes($usage['limits']['storage_bytes']) }}
+                                            @if ($usage['threshold_triggered']['storage'])
+                                                <span class="text-danger fw-semibold ms-2">Near limit</span>
+                                            @endif
+                                        </li>
+                                        <li>
+                                            GET requests: {{ number_format($usage['get_requests']) }} / {{ number_format($usage['limits']['get_requests']) }}
+                                            @if ($usage['threshold_triggered']['get'])
+                                                <span class="text-danger fw-semibold ms-2">Near limit</span>
+                                            @endif
+                                        </li>
+                                        <li>
+                                            PUT/COPY/POST/LIST requests: {{ number_format($usage['put_requests']) }} / {{ number_format($usage['limits']['put_requests']) }}
+                                            @if ($usage['threshold_triggered']['put'])
+                                                <span class="text-danger fw-semibold ms-2">Near limit</span>
+                                            @endif
+                                        </li>
+                                        <li>
+                                            Data Transfer Out: {{ $formatBytes($usage['egress_bytes']) }} / {{ $formatBytes($usage['limits']['egress_bytes']) }}
+                                            @if ($usage['threshold_triggered']['egress'])
+                                                <span class="text-danger fw-semibold ms-2">Near limit</span>
+                                            @endif
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
 
                             <div class="col-md-6 mb-3" id="priceField" style="display: none;">
@@ -122,7 +197,7 @@
                     <!-- Image File Section -->
                     <div class="col-md-6 mb-4" id="imageFileSection">
                         <label class="form-label-custom">PNG/JPG Image File</label>
-                        <div class="image-preview" style="height: 150px;" id="imagePreview"
+            <div class="image-preview" style="height: 150px;" id="imagePreview"
                             onclick="document.getElementById('imageFile').click()">
                             <div class="text-center text-muted">
                                 <i class="bi bi-file-earmark-image" style="font-size: 36px;"></i>
@@ -194,73 +269,5 @@
 @endsection
 
 @push('scripts')
-    <script>
-        // Show/hide price field based on type
-        document.getElementById('projectType').addEventListener('change', function() {
-            const priceField = document.getElementById('priceField');
-            if (this.value === 'paid') {
-                priceField.style.display = 'block';
-            } else {
-                priceField.style.display = 'none';
-            }
-        });
-
-        // Show/hide file sections based on file type
-        document.getElementById('fileType').addEventListener('change', function() {
-            const imageSection = document.getElementById('imageFileSection');
-            const videoSection = document.getElementById('videoFileSection');
-            const sourceSection = document.getElementById('sourceFileSection');
-            const thumbnailSection = document.getElementById('thumbnailSection');
-            const thumbnailInput = document.getElementById('thumbnailImage');
-            const thumbnailRequired = document.getElementById('thumbnailRequired');
-            const thumbnailHint = document.getElementById('thumbnailHint');
-
-            if (this.value === 'image') {
-                imageSection.style.display = 'block';
-                videoSection.style.display = 'none';
-                thumbnailSection.style.display = 'block';
-                thumbnailInput.required = true;
-                thumbnailRequired.style.display = 'inline';
-                thumbnailHint.textContent = 'Required for image projects';
-            } else if (this.value === 'video') {
-                imageSection.style.display = 'none';
-                videoSection.style.display = 'block';
-                thumbnailSection.style.display = 'block';
-                thumbnailInput.required = false;
-                thumbnailRequired.style.display = 'none';
-                thumbnailHint.textContent = 'Optional - used as fallback if video link fails';
-            }
-
-            // Always show source file section
-            sourceSection.style.display = 'block';
-        });
-
-        // Image preview for thumbnail
-        document.getElementById('thumbnailImage').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const preview = document.getElementById('thumbnailPreview');
-                    preview.innerHTML =
-                        `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Image preview for image file
-        document.getElementById('imageFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const preview = document.getElementById('imagePreview');
-                    preview.innerHTML =
-                        `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
+    @include('admin.projects.partials.form-scripts')
 @endpush

@@ -4,11 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Jobs\ProcessProjectAssets;
 use App\Models\Project;
+use App\Models\StorageSetting;
+use App\Services\Storage\S3UsageService;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 class ProjectController extends Controller
 {
@@ -30,7 +36,11 @@ class ProjectController extends Controller
     public function create()
     {
         $categories = Category::active()->get();
-        return view('admin.projects.create', compact('categories'));
+        $storageSettings = StorageSetting::getSettings();
+        $s3Snapshot = app(S3UsageService::class)->snapshot();
+        $s3Available = $storageSettings->hasValidS3Credentials() && !$storageSettings->avoid_s3;
+
+        return view('admin.projects.create', compact('categories', 'storageSettings', 's3Snapshot', 's3Available'));
     }
 
     /**
@@ -38,6 +48,10 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        $settings = StorageSetting::getSettings();
+        $snapshot = app(S3UsageService::class)->snapshot();
+        $effectiveStorageType = $this->determineStorageType($request->input('storage_type'), $settings, $snapshot);
+
         $rules = [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -48,46 +62,43 @@ class ProjectController extends Controller
             'category_id' => 'required|exists:categories,id',
             'thumbnail' => 'nullable|image|max:2048',
             'image' => 'nullable|image|max:5120',
-            'source_file' => 'nullable|file|mimes:zip,rar,7z,psd,ai|max:10240',
-            'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:10240',
+            'source_file' => 'nullable|file|mimes:zip,rar,7z,psd,ai|max:20480',
+            'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:51200',
             'video_link' => ['nullable', 'url', function ($attribute, $value, $fail) {
                 if ($value && !preg_match('/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/', $value)) {
                     $fail('The video link must be a valid YouTube URL.');
                 }
             }],
+            'storage_type' => 'nullable|in:local,s3',
         ];
 
-        // Make thumbnail required only if file_type is image
         if ($request->file_type === 'image') {
             $rules['thumbnail'] = 'required|image|max:2048';
         }
 
         $validated = $request->validate($rules);
 
-        $validated['user_id'] = Auth::id();
-        $validated['slug'] = Str::slug($validated['title']);
+        $projectData = Arr::except($validated, ['thumbnail', 'image', 'source_file', 'video']);
+        $projectData['user_id'] = Auth::id();
+        $projectData['slug'] = Str::slug($projectData['title']);
+        $projectData['storage_type'] = $effectiveStorageType === 's3' ? 'local' : $effectiveStorageType;
 
-        // Handle file uploads
-        if ($request->hasFile('thumbnail')) {
-            $validated['thumbnail'] = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+        $project = Project::create($projectData);
+
+        [$payload, $previousPaths] = $this->prepareAssetPayload($request);
+
+        if ($this->hasAssetPayload($payload)) {
+            ProcessProjectAssets::dispatch(
+                $project->id,
+                $payload,
+                $effectiveStorageType,
+                $previousPaths,
+                $project->storage_type
+            );
         }
-
-        if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('projects/images', 'public');
-        }
-
-        if ($request->hasFile('source_file')) {
-            $validated['source_file'] = $request->file('source_file')->store('projects/sources', 'public');
-        }
-
-        if ($request->hasFile('video')) {
-            $validated['video'] = $request->file('video')->store('projects/videos', 'public');
-        }
-
-        Project::create($validated);
 
         return redirect()->route('admin.projects.index')
-            ->with('success', 'Project created successfully');
+            ->with('success', 'Project created successfully and queued for asset processing');
     }
 
     /**
@@ -105,7 +116,11 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $categories = Category::active()->get();
-        return view('admin.projects.edit', compact('project', 'categories'));
+        $storageSettings = StorageSetting::getSettings();
+        $s3Snapshot = app(S3UsageService::class)->snapshot();
+        $s3Available = $storageSettings->hasValidS3Credentials() && !$storageSettings->avoid_s3;
+
+        return view('admin.projects.edit', compact('project', 'categories', 'storageSettings', 's3Snapshot', 's3Available'));
     }
 
     /**
@@ -113,6 +128,11 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
+        $settings = StorageSetting::getSettings();
+        $snapshot = app(S3UsageService::class)->snapshot();
+        $requestedStorageType = $request->input('storage_type', $project->storage_type);
+        $effectiveStorageType = $this->determineStorageType($requestedStorageType, $settings, $snapshot);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -123,50 +143,46 @@ class ProjectController extends Controller
             'category_id' => 'required|exists:categories,id',
             'thumbnail' => 'nullable|image|max:2048',
             'image' => 'nullable|image|max:5120',
-            'source_file' => 'nullable|file|mimes:zip,rar,7z,psd,ai|max:10240',
-            'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:10240',
+            'source_file' => 'nullable|file|mimes:zip,rar,7z,psd,ai|max:20480',
+            'video' => 'nullable|mimes:mp4,avi,mov,wmv|max:51200',
             'video_link' => ['nullable', 'url', function ($attribute, $value, $fail) {
                 if ($value && !preg_match('/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/', $value)) {
                     $fail('The video link must be a valid YouTube URL.');
                 }
             }],
+            'storage_type' => 'nullable|in:local,s3',
         ]);
 
-        $validated['slug'] = Str::slug($validated['title']);
+        $existingPaths = $project->only(['thumbnail', 'image', 'source_file', 'video']);
+        $previousStorageType = $project->storage_type;
+        $storageTypeChanged = $previousStorageType !== $effectiveStorageType;
 
-        // Handle file uploads
-        if ($request->hasFile('thumbnail')) {
-            if ($project->thumbnail) {
-                Storage::disk('public')->delete($project->thumbnail);
-            }
-            $validated['thumbnail'] = $request->file('thumbnail')->store('projects/thumbnails', 'public');
+        $projectData = Arr::except($validated, ['thumbnail', 'image', 'source_file', 'video']);
+        $projectData['slug'] = Str::slug($projectData['title']);
+        $projectData['storage_type'] = $storageTypeChanged ? $previousStorageType : $effectiveStorageType;
+
+        $project->update($projectData);
+
+        [$payload, $previousPaths] = $this->prepareAssetPayload(
+            $request,
+            $project,
+            $storageTypeChanged,
+            $previousStorageType,
+            $existingPaths
+        );
+
+        if ($this->hasAssetPayload($payload) || $storageTypeChanged) {
+            ProcessProjectAssets::dispatch(
+                $project->id,
+                $payload,
+                $effectiveStorageType,
+                $previousPaths,
+                $previousStorageType
+            );
         }
-
-        if ($request->hasFile('image')) {
-            if ($project->image) {
-                Storage::disk('public')->delete($project->image);
-            }
-            $validated['image'] = $request->file('image')->store('projects/images', 'public');
-        }
-
-        if ($request->hasFile('source_file')) {
-            if ($project->source_file) {
-                Storage::disk('public')->delete($project->source_file);
-            }
-            $validated['source_file'] = $request->file('source_file')->store('projects/sources', 'public');
-        }
-
-        if ($request->hasFile('video')) {
-            if ($project->video) {
-                Storage::disk('public')->delete($project->video);
-            }
-            $validated['video'] = $request->file('video')->store('projects/videos', 'public');
-        }
-
-        $project->update($validated);
 
         return redirect()->route('admin.projects.index')
-            ->with('success', 'Project updated successfully');
+            ->with('success', 'Project updated successfully and queued for asset processing');
     }
 
     /**
@@ -174,19 +190,18 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        // Delete associated files
-        if ($project->thumbnail) {
-            Storage::disk('public')->delete($project->thumbnail);
-        }
-        if ($project->image) {
-            Storage::disk('public')->delete($project->image);
-        }
-        if ($project->source_file) {
-            Storage::disk('public')->delete($project->source_file);
-        }
-        if ($project->video) {
-            Storage::disk('public')->delete($project->video);
-        }
+        $paths = new \App\Services\Storage\Data\StoredAssetPaths(
+            $project->thumbnail,
+            $project->image,
+            $project->source_file,
+            $project->video
+        );
+
+        app(\App\Services\Storage\ProjectAssetManager::class)->delete(
+            $project,
+            $paths,
+            $project->storage_type
+        );
 
         $project->delete();
 
@@ -205,5 +220,118 @@ class ProjectController extends Controller
             'success' => true,
             'is_active' => $project->is_active
         ]);
+    }
+
+    protected function determineStorageType(?string $requested, StorageSetting $settings, ?array $snapshot = null): string
+    {
+        $requested = $requested ?: ($settings->default_storage_type ?? 'local');
+
+        if ($settings->avoid_s3) {
+            return 'local';
+        }
+
+        if ($requested === 's3' && !$settings->hasValidS3Credentials()) {
+            return 'local';
+        }
+
+        if ($requested === 's3' && $snapshot && ($snapshot['force_local'] ?? false)) {
+            return 'local';
+        }
+
+        return $requested === 's3' ? 's3' : 'local';
+    }
+
+    /**
+     * @return array{0: array<string, mixed>, 1: array<string, string>}
+     */
+    protected function prepareAssetPayload(
+        Request $request,
+        ?Project $project = null,
+        bool $includeExisting = false,
+        ?string $existingStorageType = null,
+        array $existingPaths = []
+    ): array {
+        $payload = [];
+        $previousPaths = [];
+
+        $map = [
+            'thumbnail' => ['field' => 'thumbnail', 'temp_key' => 'thumbnail_temp_path', 'name_key' => 'thumbnail_original_name', 'type' => 'thumbnails'],
+            'image' => ['field' => 'image', 'temp_key' => 'image_temp_path', 'name_key' => 'image_original_name', 'type' => 'images'],
+            'source_file' => ['field' => 'source_file', 'temp_key' => 'source_temp_path', 'name_key' => 'source_original_name', 'type' => 'sources'],
+            'video' => ['field' => 'video', 'temp_key' => 'video_temp_path', 'name_key' => 'video_original_name', 'type' => 'videos'],
+        ];
+
+        foreach ($map as $attribute => $config) {
+            $field = $config['field'];
+            $existingPath = $existingPaths[$attribute] ?? ($project ? $project->{$attribute} : null);
+
+            if ($request->hasFile($field)) {
+                [$tempPath, $originalName] = $this->storeTemporaryFile($request->file($field), $config['type']);
+                $payload[$config['temp_key']] = $tempPath;
+                $payload[$config['name_key']] = $originalName;
+
+                if ($existingPath) {
+                    $previousPaths[$attribute] = $existingPath;
+                }
+                continue;
+            }
+
+            if ($includeExisting && $existingPath) {
+                $copied = $this->copyExistingAssetToTemp(
+                    $existingStorageType ?? ($project?->storage_type ?? 'local'),
+                    $existingPath,
+                    $config['type']
+                );
+
+                if ($copied) {
+                    [$tempPath, $originalName] = $copied;
+                    $payload[$config['temp_key']] = $tempPath;
+                    $payload[$config['name_key']] = $originalName;
+                    $previousPaths[$attribute] = $existingPath;
+                }
+            }
+        }
+
+        return [$payload, $previousPaths];
+    }
+
+    protected function storeTemporaryFile(UploadedFile $file, string $type): array
+    {
+        $directory = $this->temporaryDirectory($type);
+        Storage::disk('local')->makeDirectory($directory);
+        $storedPath = $file->store($directory, 'local');
+
+        return [$storedPath, $file->getClientOriginalName()];
+    }
+
+    protected function copyExistingAssetToTemp(string $storageType, string $path, string $type): ?array
+    {
+        $disk = $storageType === 's3' ? 'project_s3' : 'project_local';
+
+        if (!Storage::disk($disk)->exists($path)) {
+            return null;
+        }
+
+        $contents = Storage::disk($disk)->get($path);
+        $directory = $this->temporaryDirectory($type);
+        Storage::disk('local')->makeDirectory($directory);
+        $filename = basename($path);
+        $tempPath = "{$directory}/{$filename}";
+
+        Storage::disk('local')->put($tempPath, $contents);
+
+        return [$tempPath, $filename];
+    }
+
+    protected function temporaryDirectory(string $type): string
+    {
+        return 'temp/projects/' . now()->format('Ymd') . '/' . $type;
+    }
+
+    protected function hasAssetPayload(array $payload): bool
+    {
+        return collect($payload)
+            ->filter(fn($value, $key) => str_ends_with($key, '_temp_path') && filled($value))
+            ->isNotEmpty();
     }
 }

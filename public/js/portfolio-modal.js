@@ -146,10 +146,10 @@
     // Show Image
     function showImage(project) {
         let imageSrc = '';
-        if (project.thumbnail) {
-            imageSrc = '/storage/' + project.thumbnail;
-        } else if (project.image) {
-            imageSrc = '/storage/' + project.image;
+        if (project.thumbnail_url) {
+            imageSrc = project.thumbnail_url;
+        } else if (project.image_url) {
+            imageSrc = project.image_url;
         } else {
             imageSrc = 'https://via.placeholder.com/800x600';
         }

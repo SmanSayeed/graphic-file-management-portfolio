@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\StorageManagementController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/project/{project}', [HomeController::class, 'getProject'])->name('project.show');
 Route::get('/category/{slug}', [HomeController::class, 'categoryShow'])->name('category.show');
+Route::get('/works', [HomeController::class, 'works'])->name('works.index');
 
 // Like Routes
 Route::post('/projects/{project}/like', [LikeController::class, 'toggleLike'])->name('projects.like');
@@ -90,4 +93,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:root_admin,adm
     Route::post('/optimization/migrate', [\App\Http\Controllers\Admin\SiteOptimizationController::class, 'runMigrations'])->name('optimization.migrate');
     Route::post('/optimization/clear', [\App\Http\Controllers\Admin\SiteOptimizationController::class, 'clearOptimization'])->name('optimization.clear');
     Route::post('/optimization/cache', [\App\Http\Controllers\Admin\SiteOptimizationController::class, 'cacheOptimization'])->name('optimization.cache');
+
+    // Analytics
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+
+    // Storage Management
+    Route::get('/storage-management', [StorageManagementController::class, 'index'])->name('storage.index');
+    Route::post('/storage-management/settings', [StorageManagementController::class, 'updateSettings'])->name('storage.settings.update');
+    Route::post('/storage-management/test', [StorageManagementController::class, 'testConnection'])->name('storage.test');
+    Route::post('/storage-management/toggle-avoid', [StorageManagementController::class, 'toggleAvoidS3'])->name('storage.toggle');
+    Route::post('/storage-management/run-queue', [StorageManagementController::class, 'runQueue'])->name('storage.queue.run');
+    Route::get('/storage-management/usage-logs', [StorageManagementController::class, 'usageLogs'])->name('storage.logs');
+    Route::get('/storage-management/queue-logs', [StorageManagementController::class, 'queueLogs'])->name('storage.queue.logs');
+    Route::post('/storage-management/logs/clear', [StorageManagementController::class, 'clearLogs'])->name('storage.logs.clear');
+
+    // Queue Monitor
+    Route::get('/queue-monitor', [\App\Http\Controllers\Admin\QueueMonitorController::class, 'index'])->name('queue.index');
+    Route::get('/queue-monitor/stats', [\App\Http\Controllers\Admin\QueueMonitorController::class, 'stats'])->name('queue.stats');
 });

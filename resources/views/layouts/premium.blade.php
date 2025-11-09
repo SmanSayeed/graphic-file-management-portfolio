@@ -9,10 +9,17 @@
     @php
         $siteTitle = optional($siteSettings)->site_name ?? config('app.name', 'Graphic Portfolio');
         $faviconUrl = optional($siteSettings)->favicon_url ?? asset('favicon.ico');
+        $portfolioInfo = \App\Models\PersonalInfo::first();
+        $defaultDescription =
+            $portfolioInfo?->short_bio ??
+            ($portfolioInfo?->full_bio ??
+                'Professional graphic design portfolio with premium quality designs, creative works, and downloadable resources.');
+
+        $pageTitle = trim($__env->yieldContent('title')) ?: $siteTitle;
+        $pageDescription = trim($__env->yieldContent('description')) ?: $defaultDescription;
     @endphp
-    <title>@yield('title', $siteTitle)</title>
-    <meta name="description"
-        content="@yield('description', 'Professional graphic design portfolio with premium quality designs, creative works, and downloadable resources.')">
+    <title>{{ $pageTitle }}</title>
+    <meta name="description" content="{{ $pageDescription }}">
     <meta name="keywords" content="graphic design, portfolio, logo design, branding, creative agency">
     <meta name="author" content="{{ $siteTitle }}">
 

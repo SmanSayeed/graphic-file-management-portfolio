@@ -19,11 +19,28 @@
                     <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
                         <div class="hero-slide-item">
                             <img src="{{ asset('storage/' . $slider->image) }}" alt="{{ $slider->title }}"
-                                class="hero-slide-image d-block w-100">
+                                class="hero-slide-image d-block w-100" loading="lazy">
                             <div class="hero-slide-overlay">
                                 <div class="container">
                                     <div class="row">
                                         <div class="col-lg-8 mx-auto text-center">
+                                            {{-- @if ($slider->title)
+                                                <h1 class="hero-slide-title display-font mb-3">
+                                                    {{ $slider->title }}
+                                                </h1>
+                                            @endif
+
+                                            @if ($slider->subtitle)
+                                                <h3 class="hero-slide-subtitle mb-3">
+                                                    {{ $slider->subtitle }}
+                                                </h3>
+                                            @endif
+
+                                            @if ($slider->description)
+                                                <p class="hero-slide-description mb-4">
+                                                    {{ $slider->description }}
+                                                </p>
+                                            @endif --}}
 
                                             @if ($slider->button_text && $slider->button_link)
                                                 <a href="{{ $slider->button_link }}" class="btn-view-projects">

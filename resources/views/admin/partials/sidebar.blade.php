@@ -87,6 +87,24 @@
             <span class="menu-text">Site Settings</span>
         </a>
 
+        <a href="{{ route('admin.storage.index') }}"
+            class="menu-item {{ request()->routeIs('admin.storage.*') ? 'active' : '' }}">
+            <i class="bi bi-cloud-arrow-up"></i>
+            <span class="menu-text">Storage Management</span>
+        </a>
+
+        <a href="{{ route('admin.queue.index') }}"
+            class="menu-item {{ request()->routeIs('admin.queue.*') ? 'active' : '' }}">
+            <i class="bi bi-stack"></i>
+            <span class="menu-text">Queue Monitor</span>
+        </a>
+
+        <a href="{{ route('admin.analytics.index') }}"
+            class="menu-item {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span class="menu-text">Analytics</span>
+        </a>
+
         <a href="{{ route('admin.optimization.index') }}"
             class="menu-item {{ request()->routeIs('admin.optimization.*') ? 'active' : '' }}">
             <i class="bi bi-lightning-charge"></i>

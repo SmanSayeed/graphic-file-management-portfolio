@@ -76,8 +76,62 @@ html {
     padding: 0;
 }
 
+.nav-top-row {
+    gap: 16px;
+}
+
 .nav-menu-premium .nav-item-premium {
     position: relative;
+}
+
+.nav-item-search {
+    margin-left: 10px;
+}
+
+.nav-search-form {
+    display: flex;
+    align-items: center;
+    background: #f1f3f5;
+    padding: 6px 12px;
+    border-radius: 50px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-search-form:focus-within {
+    background: #ffffff;
+    border-color: rgba(0, 184, 148, 0.35);
+    box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.12);
+}
+
+.nav-search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2D3436;
+    width: 160px;
+}
+
+.nav-search-input::placeholder {
+    color: #a0a0a0;
+}
+
+.nav-search-btn {
+    border: none;
+    background: transparent;
+    color: #00B894;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.nav-search-btn:hover {
+    transform: scale(1.05);
 }
 
 .nav-menu-premium .nav-link-premium {
@@ -197,6 +251,52 @@ html {
 
 .mobile-menu-toggle.active span:nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
+}
+
+.drawer-search-form {
+    padding: 10px 20px 10px 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.drawer-search-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f1f3f5;
+    border-radius: 14px;
+    padding: 10px 14px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.drawer-search-inner:focus-within {
+    background: #ffffff;
+    border-color: rgba(0, 184, 148, 0.35);
+    box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.12);
+}
+
+.drawer-search-inner i {
+    color: #00B894;
+}
+
+.drawer-search-inner input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 15px;
+}
+
+.drawer-search-clear {
+    color: #adb5bd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.drawer-search-clear:hover {
+    color: #F5576C;
 }
 
 /* Mobile Drawer */
@@ -521,6 +621,10 @@ html {
         display: none;
     }
 
+    .nav-item-search {
+        display: none;
+    }
+
     .mobile-menu-toggle {
         display: flex;
         flex-direction: column;
@@ -542,6 +646,16 @@ html {
 
     .mobile-drawer {
         width: 260px;
+    }
+
+    .drawer-search-inner {
+        min-width: 120px;
+        padding: 7px 10px;
+    }
+
+    .drawer-search-inner input {
+        width: 90px;
+        font-size: 13px;
     }
 }
 
