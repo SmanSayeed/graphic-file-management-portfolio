@@ -63,6 +63,27 @@
 
 @push('styles')
     <style>
+        #about .about-image-wrapper {
+            max-width: 70%;
+            margin: 0 auto;
+        }
+
+        #about .about-image {
+            width: 100%;
+        }
+
+        @media (max-width: 991.98px) {
+            #about .about-image-wrapper {
+                max-width: 85%;
+            }
+        }
+
+        @media (max-width: 767.98px) {
+            #about .about-image-wrapper {
+                max-width: 100%;
+            }
+        }
+
         .about-description p {
             font-size: 17px;
             line-height: 1.8;
