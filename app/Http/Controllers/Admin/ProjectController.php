@@ -88,6 +88,7 @@ class ProjectController extends Controller
 
         [$payload, $previousPaths] = $this->prepareAssetPayload($request);
 
+        $jobId = null;
         if ($this->hasAssetPayload($payload)) {
             ProcessProjectAssets::dispatch(
                 $project->id,
@@ -96,6 +97,33 @@ class ProjectController extends Controller
                 $previousPaths,
                 $project->storage_type
             );
+            
+            // Get the job ID by searching for the project ID in the job payload
+            // Jobs are serialized, so we search for the project ID in the payload
+            $job = DB::table('jobs')
+                ->where('queue', 'default')
+                ->where('payload', 'like', '%"projectId":' . $project->id . '%')
+                ->latest('id')
+                ->first();
+            
+            $jobId = $job->id ?? null;
+            
+            // Update project with processing status and job ID
+            $project->update([
+                'processing_status' => 'pending',
+                'processing_job_id' => $jobId,
+            ]);
+        }
+
+        // Return JSON response if AJAX request, otherwise redirect
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Project created successfully and queued for asset processing',
+                'project_id' => $project->id,
+                'job_id' => $jobId,
+                'has_assets' => $this->hasAssetPayload($payload),
+            ]);
         }
 
         return redirect()->route('admin.projects.index')
@@ -172,6 +200,7 @@ class ProjectController extends Controller
             $existingPaths
         );
 
+        $jobId = null;
         if ($this->hasAssetPayload($payload) || $storageTypeChanged) {
             ProcessProjectAssets::dispatch(
                 $project->id,
@@ -180,6 +209,33 @@ class ProjectController extends Controller
                 $previousPaths,
                 $previousStorageType
             );
+            
+            // Get the job ID by searching for the project ID in the job payload
+            $job = DB::table('jobs')
+                ->where('queue', 'default')
+                ->where('payload', 'like', '%"projectId":' . $project->id . '%')
+                ->latest('id')
+                ->first();
+            
+            $jobId = $job->id ?? null;
+            
+            // Update project with processing status and job ID
+            $project->update([
+                'processing_status' => 'pending',
+                'processing_job_id' => $jobId,
+                'processing_error' => null,
+            ]);
+        }
+
+        // Return JSON response if AJAX request, otherwise redirect
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Project updated successfully and queued for asset processing',
+                'project_id' => $project->id,
+                'job_id' => $jobId,
+                'has_assets' => $this->hasAssetPayload($payload) || $storageTypeChanged,
+            ]);
         }
 
         return redirect()->route('admin.projects.index')

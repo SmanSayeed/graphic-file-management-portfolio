@@ -40,6 +40,14 @@ class ProcessProjectAssets implements ShouldQueue
     public function handle(ProjectAssetManager $assetManager): void
     {
         try {
+            $project = Project::findOrFail($this->projectId);
+            
+            // Update status to processing
+            $project->update([
+                'processing_status' => 'processing',
+                'processing_error' => null,
+            ]);
+
             // Ensure S3 configuration is applied before processing
             $settings = StorageSetting::getSettings();
             $settings->applyToConfig();
@@ -47,7 +55,6 @@ class ProcessProjectAssets implements ShouldQueue
             // Clear any cached config to ensure fresh values
             config()->set('filesystems.disks.project_s3', null);
 
-            $project = Project::findOrFail($this->projectId);
             $payload = AssetUploadData::fromArray($this->assetPayload);
 
             $stored = $assetManager->store($project, $payload, $this->storageType);
@@ -62,7 +69,12 @@ class ProcessProjectAssets implements ShouldQueue
 
             $project->update(array_merge(
                 $stored->toArray(),
-                ['storage_type' => $this->storageType]
+                [
+                    'storage_type' => $this->storageType,
+                    'processing_status' => 'completed',
+                    'processing_job_id' => null,
+                    'processing_error' => null,
+                ]
             ));
 
             $this->logUsage($project, $stored);
@@ -72,6 +84,19 @@ class ProcessProjectAssets implements ShouldQueue
 
             Cache::forget('s3-usage-snapshot-' . now()->format('Ym'));
         } catch (\Throwable $e) {
+            // Update project status to failed
+            try {
+                $project = Project::find($this->projectId);
+                if ($project) {
+                    $project->update([
+                        'processing_status' => 'failed',
+                        'processing_error' => $e->getMessage(),
+                    ]);
+                }
+            } catch (\Throwable $updateError) {
+                // Ignore update errors
+            }
+
             Log::error("Error processing project assets", [
                 'project_id' => $this->projectId,
                 'storage_type' => $this->storageType,
@@ -87,6 +112,19 @@ class ProcessProjectAssets implements ShouldQueue
             'project_id' => $this->projectId,
             'error' => $exception->getMessage(),
         ]);
+
+        // Update project status to failed
+        try {
+            $project = Project::find($this->projectId);
+            if ($project) {
+                $project->update([
+                    'processing_status' => 'failed',
+                    'processing_error' => $exception->getMessage(),
+                ]);
+            }
+        } catch (\Throwable $updateError) {
+            // Ignore update errors
+        }
 
         StorageUsageLog::create([
             'project_id' => $this->projectId,

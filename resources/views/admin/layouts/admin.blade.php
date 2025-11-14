@@ -46,6 +46,24 @@
         </div>
     </div>
 
+    <!-- Queue Processing Modal -->
+    <div class="modal fade" id="queueProcessingModal" tabindex="-1" aria-labelledby="queueProcessingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-5">
+                    <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 class="mb-2" id="queueProcessingTitle">Processing Files...</h5>
+                    <p class="text-muted mb-0" id="queueProcessingMessage">Please wait while files are being uploaded. This may take a few moments.</p>
+                    <div class="mt-3">
+                        <small class="text-muted" id="queueProcessingStatus">Queued for processing...</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

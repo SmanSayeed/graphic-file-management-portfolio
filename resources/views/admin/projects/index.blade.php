@@ -33,13 +33,14 @@
                             <th>File Type</th>
                             <th>Downloads</th>
                             <th>Likes</th>
+                            <th>Processing</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($projects as $project)
-                            <tr>
+                            <tr data-processing-status="{{ $project->processing_status ?? 'completed' }}">
                                 <td>
                                     @if ($project->thumbnail_url)
                                         <img src="{{ $project->thumbnail_url }}" class="rounded"
@@ -75,6 +76,25 @@
                                     <span class="badge bg-danger">{{ number_format($project->like_count) }}</span>
                                 </td>
                                 <td>
+                                    @if($project->processing_status === 'pending')
+                                        <span class="badge bg-warning" title="Files queued for upload">
+                                            <i class="bi bi-clock"></i> Pending
+                                        </span>
+                                    @elseif($project->processing_status === 'processing')
+                                        <span class="badge bg-info" title="Files being uploaded">
+                                            <i class="bi bi-arrow-repeat spin"></i> Processing
+                                        </span>
+                                    @elseif($project->processing_status === 'failed')
+                                        <span class="badge bg-danger" title="{{ $project->processing_error ?? 'Upload failed' }}">
+                                            <i class="bi bi-x-circle"></i> Failed
+                                        </span>
+                                    @else
+                                        <span class="badge bg-success" title="Files uploaded successfully">
+                                            <i class="bi bi-check-circle"></i> Complete
+                                        </span>
+                                    @endif
+                                </td>
+                                <td>
                                     @if ($project->is_active)
                                         <span class="badge bg-success">Active</span>
                                     @else
@@ -105,7 +125,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center py-4">
+                                <td colspan="10" class="text-center py-4">
                                     <p class="text-muted mb-0">No projects found. <a
                                             href="{{ route('admin.projects.create') }}">Create your first project</a></p>
                                 </td>
@@ -123,3 +143,19 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh for pending/processing projects
+    const pendingRows = document.querySelectorAll('tr[data-processing-status="pending"], tr[data-processing-status="processing"]');
+    
+    if (pendingRows.length > 0) {
+        // Refresh page every 10 seconds if there are pending/processing projects
+        setTimeout(() => {
+            window.location.reload();
+        }, 10000);
+    }
+});
+</script>
+@endpush

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Http\Controllers\Admin\QueueStatusController;
 use App\Http\Controllers\Admin\StorageManagementController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
@@ -79,6 +80,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:root_admin,adm
 
     // Project Management
     Route::resource('projects', AdminProjectController::class);
+    Route::get('/projects/{project}/queue-status', [QueueStatusController::class, 'checkProjectStatus'])->name('projects.queue-status');
+    Route::get('/queue-status/{jobId}', [QueueStatusController::class, 'checkJobStatus'])->name('queue.status');
 
     // User Management
     Route::resource('users', UserController::class);

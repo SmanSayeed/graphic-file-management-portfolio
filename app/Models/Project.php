@@ -30,6 +30,9 @@ class Project extends Model
         'like_count',
         'is_active',
         'storage_type',
+        'processing_status',
+        'processing_job_id',
+        'processing_error',
     ];
 
     protected $casts = [
