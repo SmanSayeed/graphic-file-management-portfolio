@@ -39,30 +39,46 @@ class ProcessProjectAssets implements ShouldQueue
      */
     public function handle(ProjectAssetManager $assetManager): void
     {
-        $project = Project::findOrFail($this->projectId);
-        $payload = AssetUploadData::fromArray($this->assetPayload);
+        try {
+            // Ensure S3 configuration is applied before processing
+            $settings = StorageSetting::getSettings();
+            $settings->applyToConfig();
+            
+            // Clear any cached config to ensure fresh values
+            config()->set('filesystems.disks.project_s3', null);
 
-        $stored = $assetManager->store($project, $payload, $this->storageType);
+            $project = Project::findOrFail($this->projectId);
+            $payload = AssetUploadData::fromArray($this->assetPayload);
 
-        if (!empty($this->previousPaths)) {
-            $assetManager->delete(
-                $project,
-                StoredAssetPaths::fromArray($this->previousPaths),
-                $this->previousStorageType ?? $this->storageType
-            );
+            $stored = $assetManager->store($project, $payload, $this->storageType);
+
+            if (!empty($this->previousPaths)) {
+                $assetManager->delete(
+                    $project,
+                    StoredAssetPaths::fromArray($this->previousPaths),
+                    $this->previousStorageType ?? $this->storageType
+                );
+            }
+
+            $project->update(array_merge(
+                $stored->toArray(),
+                ['storage_type' => $this->storageType]
+            ));
+
+            $this->logUsage($project, $stored);
+            $this->recordAnalytics($project, $stored);
+
+            $this->cleanupTempFiles($payload);
+
+            Cache::forget('s3-usage-snapshot-' . now()->format('Ym'));
+        } catch (\Throwable $e) {
+            Log::error("Error processing project assets", [
+                'project_id' => $this->projectId,
+                'storage_type' => $this->storageType,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
         }
-
-        $project->update(array_merge(
-            $stored->toArray(),
-            ['storage_type' => $this->storageType]
-        ));
-
-        $this->logUsage($project, $stored);
-        $this->recordAnalytics($project, $stored);
-
-        $this->cleanupTempFiles($payload);
-
-        Cache::forget('s3-usage-snapshot-' . now()->format('Ym'));
     }
 
     public function failed(Throwable $exception): void

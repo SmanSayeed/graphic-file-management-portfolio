@@ -56,13 +56,13 @@ class Project extends Model
 
         static::creating(function ($project) {
             if (empty($project->slug)) {
-                $project->slug = Str::slug($project->title);
+                $project->slug = static::generateUniqueSlug($project->title);
             }
         });
 
         static::updating(function ($project) {
             if ($project->isDirty('title') && empty($project->slug)) {
-                $project->slug = Str::slug($project->title);
+                $project->slug = static::generateUniqueSlug($project->title, $project->id);
             }
         });
     }
@@ -212,9 +212,38 @@ class Project extends Model
         $disk = $this->storage_type === 's3' ? 'project_s3' : 'project_local';
 
         try {
+            if ($this->storage_type === 's3') {
+                // For S3, try to get a temporary URL (works even with Block Public Access)
+                // Temporary URLs expire after 1 hour, but can be regenerated
+                try {
+                    return Storage::disk($disk)->temporaryUrl($path, now()->addHours(24));
+                } catch (\Throwable $e) {
+                    // If temporary URL fails, try regular URL
+                    return Storage::disk($disk)->url($path);
+                }
+            }
             return Storage::disk($disk)->url($path);
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    /**
+     * Generate a unique slug for the project
+     */
+    protected static function generateUniqueSlug(string $title, ?int $excludeId = null): string
+    {
+        $slug = Str::slug($title);
+        $originalSlug = $slug;
+        $counter = 1;
+
+        while (static::where('slug', $slug)
+            ->when($excludeId, fn($query) => $query->where('id', '!=', $excludeId))
+            ->exists()) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        return $slug;
     }
 }

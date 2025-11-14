@@ -7,6 +7,7 @@ use App\Models\StorageSetting;
 use App\Services\Storage\Contracts\ProjectAssetStorage;
 use App\Services\Storage\Data\AssetUploadData;
 use App\Services\Storage\Data\StoredAssetPaths;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -39,7 +40,7 @@ class S3ProjectAssetStorage implements ProjectAssetStorage
 
     public function delete(Project $project, StoredAssetPaths $paths): void
     {
-        $disk = Storage::disk($this->disk);
+        $disk = $this->getDisk();
 
         foreach (['thumbnail', 'image', 'source', 'video'] as $attribute) {
             $path = $paths->{$attribute};
@@ -51,12 +52,56 @@ class S3ProjectAssetStorage implements ProjectAssetStorage
 
     public function url(string $path): string
     {
-        return Storage::disk($this->disk)->url($path);
+        $disk = $this->getDisk();
+
+        // Try to get a temporary URL first (works even with Block Public Access)
+        // Temporary URLs are valid for 24 hours
+        try {
+            return $disk->temporaryUrl($path, now()->addHours(24));
+        } catch (\Throwable $e) {
+            // If temporary URL fails, try regular URL (works if public access is enabled)
+            try {
+                return $disk->url($path);
+            } catch (\Throwable $e2) {
+                // If both fail, log and return empty string
+                Log::error("Failed to generate URL for S3 file: {$path} - " . $e2->getMessage());
+                return '';
+            }
+        }
+    }
+
+    /**
+     * Get the S3 disk with fresh configuration
+     * This ensures credentials are always up-to-date
+     *
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    protected function getDisk()
+    {
+        $settings = StorageSetting::getSettings();
+        $settings->applyToConfig();
+
+        $config = config('filesystems.disks.project_s3');
+
+        if (!$config || !isset($config['key']) || !isset($config['secret'])) {
+            throw new \RuntimeException('S3 configuration is missing or incomplete. Please check storage settings.');
+        }
+
+        $config['throw'] = true;
+
+        try {
+            return Storage::build($config);
+        } catch (\Exception $e) {
+            Log::error("Failed to build S3 disk instance", [
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
     }
 
     protected function storeFile(string $tempPath, ?string $originalName, string $type): string
     {
-        $disk = Storage::disk($this->disk);
+        $disk = $this->getDisk();
         $tempDisk = Storage::disk('local');
         $directory = $this->resolveDirectory($type);
         $filename = $this->generateFilename($originalName);
@@ -65,24 +110,34 @@ class S3ProjectAssetStorage implements ProjectAssetStorage
             throw new \RuntimeException("Temporary file [{$tempPath}] does not exist.");
         }
 
-        $stream = $tempDisk->readStream($tempPath);
-        if ($stream === false) {
+        $contents = $tempDisk->get($tempPath);
+        if ($contents === false || $contents === null) {
             throw new \RuntimeException("Unable to read temporary file [{$tempPath}] from local disk.");
         }
 
-        $disk->put(
-            "{$directory}/{$filename}",
-            $stream,
-            [
-                'visibility' => 'public',
-            ]
-        );
+        $path = "{$directory}/{$filename}";
 
-        if (is_resource($stream)) {
-            fclose($stream);
+        try {
+            // Upload without ACL to work with Block Public Access enabled
+            $result = $disk->put($path, $contents);
+
+            if ($result === false) {
+                throw new \RuntimeException("S3 upload failed: put() returned false");
+            }
+
+            // Verify file exists on S3
+            if (!$disk->exists($path)) {
+                throw new \RuntimeException("File upload appeared to succeed but file does not exist on S3: {$path}");
+            }
+
+            return $path;
+        } catch (\Exception $e) {
+            Log::error("Failed to upload file to S3", [
+                'path' => $path,
+                'error' => $e->getMessage()
+            ]);
+            throw new \RuntimeException("Failed to upload file to S3: " . $e->getMessage(), 0, $e);
         }
-
-        return "{$directory}/{$filename}";
     }
 
     protected function generateFilename(?string $originalName): string
@@ -103,4 +158,3 @@ class S3ProjectAssetStorage implements ProjectAssetStorage
         return "{$base}/projects/{$type}";
     }
 }
-

@@ -83,6 +83,8 @@ class StorageSetting extends Model
         ]);
 
         if ($this->hasValidS3Credentials()) {
+            $s3Url = $this->generateS3Url();
+            
             config([
                 'filesystems.disks.project_s3' => [
                     'driver' => 's3',
@@ -90,12 +92,35 @@ class StorageSetting extends Model
                     'secret' => $this->s3_secret_key,
                     'region' => $this->s3_region,
                     'bucket' => $this->s3_bucket,
-                    'url' => null,
+                    'url' => $s3Url,
                     'endpoint' => $this->s3_endpoint,
                     'use_path_style_endpoint' => $this->s3_use_path_style_endpoint,
-                    'visibility' => 'public',
+                    // Don't set visibility here - upload as private to work with Block Public Access
+                    // Files will be accessed via temporary URLs
+                    'throw' => false,
                 ],
             ]);
         }
+    }
+
+    /**
+     * Generate S3 public URL based on bucket and region
+     */
+    protected function generateS3Url(): ?string
+    {
+        if ($this->s3_endpoint) {
+            // Custom endpoint (e.g., DigitalOcean Spaces, MinIO)
+            return rtrim($this->s3_endpoint, '/') . '/' . $this->s3_bucket;
+        }
+
+        // Standard AWS S3 URL format
+        // https://bucket-name.s3.region.amazonaws.com
+        // or https://s3.region.amazonaws.com/bucket-name (for path-style)
+        
+        if ($this->s3_use_path_style_endpoint) {
+            return "https://s3.{$this->s3_region}.amazonaws.com/{$this->s3_bucket}";
+        }
+        
+        return "https://{$this->s3_bucket}.s3.{$this->s3_region}.amazonaws.com";
     }
 }

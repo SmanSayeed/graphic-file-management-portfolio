@@ -16,12 +16,12 @@ return new class extends Migration
             $table->id();
             $table->enum('default_storage_type', ['local', 's3'])->default('local');
             $table->boolean('avoid_s3')->default(false);
-            $table->string('s3_access_key')->nullable();
-            $table->string('s3_secret_key')->nullable();
+            $table->text('s3_access_key')->nullable();
+            $table->text('s3_secret_key')->nullable();
             $table->string('s3_region')->nullable();
             $table->string('s3_bucket')->nullable();
             $table->string('s3_prefix')->nullable();
-            $table->string('s3_endpoint')->nullable();
+            $table->text('s3_endpoint')->nullable();
             $table->boolean('s3_use_path_style_endpoint')->default(false);
             $table->boolean('s3_enable_usage_guard')->default(true);
             $table->enum('queue_connection', ['sync', 'database'])->default('database');
@@ -59,4 +59,3 @@ return new class extends Migration
         Schema::dropIfExists('storage_settings');
     }
 };
-
