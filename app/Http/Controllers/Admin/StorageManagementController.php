@@ -177,6 +177,104 @@ class StorageManagementController extends Controller
             ->with('success', $settings->avoid_s3 ? 'S3 usage disabled.' : 'S3 usage enabled.');
     }
 
+    /**
+     * Run queue jobs via cron (public route with token authentication)
+     * This route can be called by cPanel cron jobs
+     */
+    public function runQueueCron(Request $request)
+    {
+        // Verify token from environment or config
+        $token = $request->input('token') ?? $request->header('X-Queue-Token');
+        $expectedToken = env('QUEUE_CRON_TOKEN', config('app.queue_cron_token', 'change-this-token-in-production'));
+
+        if (!$token || $token !== $expectedToken) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid or missing token',
+            ], 401);
+        }
+
+        $maxJobs = (int) ($request->input('max_jobs', 5));
+        $maxJobs = max(1, min(25, $maxJobs)); // Clamp between 1 and 25
+
+        $settings = StorageSetting::getSettings();
+        $settings->applyToConfig();
+
+        if ($settings->queue_connection === 'sync') {
+            return response()->json([
+                'status' => 'skipped',
+                'message' => 'Queue connection is set to sync. No jobs to process.',
+            ]);
+        }
+
+        $log = QueueRunLog::create([
+            'started_at' => now(),
+            'status' => 'running',
+            'notes' => 'Cron job run',
+        ]);
+
+        $processed = 0;
+        $failedBefore = DB::table('failed_jobs')->count();
+
+        try {
+            for ($i = 0; $i < $maxJobs; $i++) {
+                $pendingBefore = DB::table('jobs')->count();
+
+                if ($pendingBefore === 0) {
+                    break;
+                }
+
+                Artisan::call('queue:work', [
+                    $settings->queue_connection,
+                    '--once' => true,
+                    '--sleep' => 0,
+                    '--tries' => $settings->queue_max_attempts,
+                    '--backoff' => $settings->queue_backoff,
+                    '--timeout' => 120,
+                    '--queue' => 'default',
+                    '--force' => true,
+                ]);
+
+                $pendingAfter = DB::table('jobs')->count();
+
+                if ($pendingAfter < $pendingBefore) {
+                    $processed++;
+                }
+
+                if ($pendingAfter === 0) {
+                    break;
+                }
+            }
+
+            $log->update([
+                'finished_at' => now(),
+                'status' => 'completed',
+                'processed_count' => $processed,
+                'failed_count' => DB::table('failed_jobs')->count() - $failedBefore,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'processed' => $processed,
+                'pending' => DB::table('jobs')->count(),
+                'failed' => DB::table('failed_jobs')->count(),
+            ]);
+        } catch (\Throwable $e) {
+            $log->update([
+                'finished_at' => now(),
+                'status' => 'failed',
+                'notes' => $e->getMessage(),
+            ]);
+
+            Log::error('Queue cron runner failed', ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Queue runner encountered an error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function runQueue(Request $request): JsonResponse
     {
         $request->validate([

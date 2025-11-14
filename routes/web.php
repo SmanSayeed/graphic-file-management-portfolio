@@ -43,6 +43,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 // Admin Login
 Route::get('/admin-login', [AuthController::class, 'showLogin'])->name('admin.login');
 
+// Queue Cron Route (Public with token authentication)
+// This route can be called by cPanel cron jobs
+// Usage: curl "https://yourdomain.com/queue/cron?token=YOUR_SECRET_TOKEN&max_jobs=5"
+Route::get('/queue/cron', [StorageManagementController::class, 'runQueueCron'])->name('queue.cron');
+
 // Admin Routes (Protected)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:root_admin,admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');

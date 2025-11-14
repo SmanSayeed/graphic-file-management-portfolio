@@ -209,21 +209,65 @@ class Project extends Model
             return null;
         }
 
-        $disk = $this->storage_type === 's3' ? 'project_s3' : 'project_local';
+        if ($this->storage_type === 's3') {
+            // Cache the URL generation to prevent multiple calls for the same path
+            // This helps prevent 503 errors when loading many projects
+            $cacheKey = "project_s3_url_{$this->id}_{$path}";
+            $cachedUrl = \Illuminate\Support\Facades\Cache::get($cacheKey);
 
-        try {
-            if ($this->storage_type === 's3') {
-                // For S3, try to get a temporary URL (works even with Block Public Access)
-                // Temporary URLs expire after 1 hour, but can be regenerated
-                try {
-                    return Storage::disk($disk)->temporaryUrl($path, now()->addHours(24));
-                } catch (\Throwable $e) {
-                    // If temporary URL fails, try regular URL
-                    return Storage::disk($disk)->url($path);
-                }
+            if ($cachedUrl !== null) {
+                return $cachedUrl ?: null;
             }
-            return Storage::disk($disk)->url($path);
+
+            // Use S3ProjectAssetStorage to generate URLs (handles finfo issues)
+            // This ensures we always use a fresh disk instance with ExtensionMimeTypeDetector
+            try {
+                $storage = app(\App\Services\Storage\Drivers\S3ProjectAssetStorage::class);
+                $url = $storage->url($path);
+
+                // Validate URL before returning
+                if (!empty($url) && filter_var($url, FILTER_VALIDATE_URL)) {
+                    // Cache the URL for 23 hours (slightly less than temporary URL validity)
+                    \Illuminate\Support\Facades\Cache::put($cacheKey, $url, now()->addHours(23));
+                    return $url;
+                }
+
+                // Cache null result for 5 minutes to prevent repeated failures
+                \Illuminate\Support\Facades\Cache::put($cacheKey, false, now()->addMinutes(5));
+
+                // If URL is empty or invalid, log and return null
+                \Illuminate\Support\Facades\Log::warning("S3 URL generation returned invalid URL", [
+                    'project_id' => $this->id,
+                    'path' => $path,
+                    'url' => $url
+                ]);
+
+                return null;
+            } catch (\Throwable $e) {
+                // Cache null result for 5 minutes to prevent repeated failures
+                \Illuminate\Support\Facades\Cache::put($cacheKey, false, now()->addMinutes(5));
+
+                // Log error but don't expose it to user
+                \Illuminate\Support\Facades\Log::error("Failed to generate S3 URL for project asset", [
+                    'project_id' => $this->id,
+                    'path' => $path,
+                    'error' => $e->getMessage(),
+                    'class' => get_class($e)
+                ]);
+                return null;
+            }
+        }
+
+        // For local storage
+        try {
+            $url = Storage::disk('project_local')->url($path);
+            return !empty($url) ? $url : null;
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to generate local URL for project asset", [
+                'project_id' => $this->id,
+                'path' => $path,
+                'error' => $e->getMessage()
+            ]);
             return null;
         }
     }
@@ -239,7 +283,8 @@ class Project extends Model
 
         while (static::where('slug', $slug)
             ->when($excludeId, fn($query) => $query->where('id', '!=', $excludeId))
-            ->exists()) {
+            ->exists()
+        ) {
             $slug = $originalSlug . '-' . $counter;
             $counter++;
         }

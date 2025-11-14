@@ -233,7 +233,23 @@ class HomeController extends Controller
                 break;
         }
 
-        if ($filePath && Storage::disk($disk)->exists($filePath)) {
+        if (!$filePath) {
+            abort(404, 'File not found');
+        }
+
+        // For S3, skip exists() check to avoid finfo dependency - download will fail if file doesn't exist
+        // For local, check exists to provide better error message
+        $fileExists = true;
+        if ($project->storage_type === 'local') {
+            try {
+                $fileExists = Storage::disk($disk)->exists($filePath);
+            } catch (\Throwable $e) {
+                // If exists() fails (e.g., finfo error), assume file exists and try download
+                $fileExists = true;
+            }
+        }
+
+        if ($fileExists) {
             $bytes = 0;
             try {
                 $bytes = Storage::disk($disk)->size($filePath);
@@ -241,47 +257,56 @@ class HomeController extends Controller
                 // ignore size retrieval failure
             }
 
-            $project->incrementDownloadCount();
+            try {
+                $project->incrementDownloadCount();
 
-            StorageUsageLog::create([
-                'project_id' => $project->id,
-                'storage_type' => $project->storage_type,
-                'action' => 'download',
-                'request_type' => 'GET',
-                'path' => $filePath,
-                'bytes' => $bytes,
-                'status' => 'success',
-                'message' => sprintf('Downloaded %s file', $type),
-            ]);
-
-            AnalyticsEvent::create([
-                'event_type' => 'egress',
-                'context' => $type,
-                'project_id' => $project->id,
-                'bytes' => $bytes,
-                'meta' => [
+                StorageUsageLog::create([
+                    'project_id' => $project->id,
                     'storage_type' => $project->storage_type,
+                    'action' => 'download',
+                    'request_type' => 'GET',
                     'path' => $filePath,
-                ],
-                'occurred_at' => now(),
-            ]);
+                    'bytes' => $bytes,
+                    'status' => 'success',
+                    'message' => sprintf('Downloaded %s file', $type),
+                ]);
 
-            $metrics = AnalyticsMetric::today();
-            $metrics->increment('downloads_total');
+                AnalyticsEvent::create([
+                    'event_type' => 'egress',
+                    'context' => $type,
+                    'project_id' => $project->id,
+                    'bytes' => $bytes,
+                    'meta' => [
+                        'storage_type' => $project->storage_type,
+                        'path' => $filePath,
+                    ],
+                    'occurred_at' => now(),
+                ]);
 
-            if ($project->storage_type === 's3') {
-                $metrics->increment('bandwidth_s3_bytes', $bytes);
-                $metrics->increment('s3_get_requests');
-            } else {
-                $metrics->increment('bandwidth_local_bytes', $bytes);
+                $metrics = AnalyticsMetric::today();
+                $metrics->increment('downloads_total');
+
+                if ($project->storage_type === 's3') {
+                    $metrics->increment('bandwidth_s3_bytes', $bytes);
+                    $metrics->increment('s3_get_requests');
+                } else {
+                    $metrics->increment('bandwidth_local_bytes', $bytes);
+                }
+
+                Cache::forget('s3-usage-snapshot-' . now()->format('Ym'));
+            } catch (\Throwable $e) {
+                // Log analytics/logging errors but don't fail the download
             }
-
-            Cache::forget('s3-usage-snapshot-' . now()->format('Ym'));
 
             /** @var \Illuminate\Filesystem\FilesystemAdapter $filesystem */
             $filesystem = Storage::disk($disk);
 
-            return $filesystem->download($filePath, $fileName);
+            try {
+                return $filesystem->download($filePath, $fileName);
+            } catch (\Throwable $e) {
+                // If download fails, return 404
+                abort(404, 'File not found or unable to download: ' . $e->getMessage());
+            }
         }
 
         abort(404, 'File not found');

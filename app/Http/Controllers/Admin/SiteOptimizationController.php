@@ -309,8 +309,9 @@ class SiteOptimizationController extends Controller
         // Check if storage link exists
         $storageLinkExists = file_exists(public_path('storage')) && is_link(public_path('storage'));
         
-        // Check if storage directory exists
-        $storageExists = Storage::disk('public')->exists('');
+        // Check if storage directory exists (using direct filesystem check to avoid finfo dependency)
+        $storagePath = storage_path('app/public');
+        $storageExists = is_dir($storagePath) || file_exists($storagePath);
 
         // Check migration status
         try {

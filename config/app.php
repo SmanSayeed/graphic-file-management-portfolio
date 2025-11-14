@@ -56,6 +56,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Queue Cron Token
+    |--------------------------------------------------------------------------
+    |
+    | This token is used to authenticate cron job requests for queue processing.
+    | Set this in your .env file as QUEUE_CRON_TOKEN.
+    |
+    */
+    'queue_cron_token' => env('QUEUE_CRON_TOKEN', 'change-this-token-in-production'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
